@@ -26,7 +26,6 @@ interface BlogListViewProps {
   tags: Tag[]
   currentPage: number
   totalPages: number
-  isReadingPost?: boolean
 }
 
 export default function BlogListView({ 
@@ -34,7 +33,6 @@ export default function BlogListView({
   tags, 
   currentPage, 
   totalPages,
-  isReadingPost = false 
 }: BlogListViewProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -75,11 +73,11 @@ export default function BlogListView({
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
           {/* Back Button */}
           <Link 
-            href={isReadingPost ? "/blog" : "/"}
+            href="/"
             className="flex items-center gap-2 text-amber-900 hover:text-amber-700 transition-colors font-Zain text-lg"
           >
             <ArrowLeft className="w-5 h-5" />
-            {isReadingPost ? "Volver a blogs" : "Volver a página principal"}
+            Volver a página principal
           </Link>
 
           {/* Tag Filter */}
