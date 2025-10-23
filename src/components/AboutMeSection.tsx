@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef } from 'react';
+import Link from "next/link";
 import { Heart, BookOpen, Podcast, GraduationCap } from 'lucide-react';
 
 export default function AboutMeSection() {
@@ -17,7 +18,7 @@ export default function AboutMeSection() {
             if (cardRef.current) {
               cardRef.current.style.opacity = '0';
               cardRef.current.style.transform = 'translateY(60px)';
-              
+
               setTimeout(() => {
                 cardRef.current!.style.transition = 'all 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
                 cardRef.current!.style.opacity = '1';
@@ -29,7 +30,7 @@ export default function AboutMeSection() {
             if (imageRef.current) {
               imageRef.current.style.opacity = '0';
               imageRef.current.style.transform = 'scale(0.8) rotate(-10deg)';
-              
+
               setTimeout(() => {
                 imageRef.current!.style.transition = 'all 1.4s cubic-bezier(0.16, 1, 0.3, 1)';
                 imageRef.current!.style.opacity = '1';
@@ -44,7 +45,7 @@ export default function AboutMeSection() {
                 if (!(el instanceof HTMLElement)) return;
                 el.style.opacity = '0';
                 el.style.transform = 'translateY(30px)';
-                
+
                 setTimeout(() => {
                   el.style.transition = 'all 1s cubic-bezier(0.16, 1, 0.3, 1)';
                   el.style.opacity = '1';
@@ -81,26 +82,26 @@ export default function AboutMeSection() {
 
       {/* Main Card */}
       <div className="max-w-6xl mx-auto">
-        <div 
+        <div
           ref={cardRef}
           className="relative backdrop-blur-xl bg-white/40 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 shadow-2xl border border-white/50"
           style={{
             boxShadow: '0 25px 50px -12px rgba(139, 69, 19, 0.15), inset 0 0 30px rgba(255, 255, 255, 0.1)'
           }}
         >
-          
+
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
             {/* Image Container */}
             <div ref={imageRef} className="relative flex-shrink-0">
               <div className="relative w-56 h-56 md:w-64 md:h-64 lg:w-72 lg:h-72">
                 {/* Outer glow ring */}
                 <div className="absolute -inset-4 rounded-full bg-gradient-to-br from-[#D2B48C]/30 to-white/20 blur-xl animate-pulse" />
-                
+
                 {/* Main image container */}
                 <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white/50 shadow-2xl bg-gradient-to-br from-[#D2B48C] to-[#DEB887]">
-                  <img 
-                    src="/photo.jpg" 
-                    alt="Camila Rodríguez - Reiki Master" 
+                  <img
+                    src="/photo.jpg"
+                    alt="Camila Rodríguez - Reiki Master"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -112,7 +113,7 @@ export default function AboutMeSection() {
               {/* Floating badge */}
               <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-[#8B4513] to-[#A0522D] backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-white/50">
                 <span className="text-md font-Zain text-white flex items-center gap-2">
-                  Reiki Master
+                  Terapeuta Holística
                 </span>
               </div>
             </div>
@@ -146,7 +147,7 @@ export default function AboutMeSection() {
                 <p className='font-DMSans'>
                   Reiki Usui Master certificada por Mount Royal University, Terapeuta Holística, Life & Spiritual Coach, facilitadora en PNL y Psicóloga, con más de 10 años de experiencia en meditación y prácticas espirituales.
                 </p>
-                
+
                 <p className='font-DMSans'>
                   Mi acompañamiento integra diferentes enfoques para guiar procesos de transformación profunda desde la energía, la conciencia y el autoconocimiento, con un enfoque emocional, holístico y espiritual.
                 </p>
@@ -161,19 +162,31 @@ export default function AboutMeSection() {
 
               {/* Action Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-                <div className="group relative backdrop-blur-xl bg-white/30 rounded-2xl p-5 border border-white/50 hover:bg-white/40 hover:scale-105 hover:shadow-xl transition-all cursor-pointer">
+                <Link
+                  href="/blog"
+                  className="group relative backdrop-blur-xl bg-white/30 rounded-2xl p-5 border border-white/50 hover:bg-white/40 hover:scale-105 hover:shadow-xl transition-all cursor-pointer"
+                >
                   <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#8B4513]/10 to-[#A0522D]/10 -z-10 blur-lg" />
                   <BookOpen className="w-7 h-7 text-[#8B4513] mb-3 group-hover:scale-110 transition-transform" />
                   <h4 className="font-Zain text-xl font-bold text-[#8B4513] mb-1">Blog</h4>
-                  <p className="text-sm text-[#8B4513]/70 font-DMSans">Reflexiones y herramientas</p>
-                </div>
+                  <p className="text-sm text-[#8B4513]/70 font-DMSans">
+                    Reflexiones y herramientas
+                  </p>
+                </Link>
 
-                <div className="group relative backdrop-blur-xl bg-white/30 rounded-2xl p-5 border border-white/50 hover:bg-white/40 hover:scale-105 hover:shadow-xl transition-all cursor-pointer">
+                <a
+                  href="https://linktr.ee/ElevarteHolistico"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative backdrop-blur-xl bg-white/30 rounded-2xl p-5 border border-white/50 hover:bg-white/40 hover:scale-105 hover:shadow-xl transition-all cursor-pointer"
+                >
                   <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#8B4513]/10 to-[#A0522D]/10 -z-10 blur-lg" />
                   <Podcast className="w-7 h-7 text-[#8B4513] mb-3 group-hover:scale-110 transition-transform" />
                   <h4 className="font-Zain text-xl font-bold text-[#8B4513] mb-1">Podcast</h4>
-                  <p className="text-sm text-[#8B4513]/70 font-DMSans">Desarrollo personal y espiritual</p>
-                </div>
+                  <p className="text-sm text-[#8B4513]/70 font-DMSans">
+                    Desarrollo personal y espiritual
+                  </p>
+                </a>
               </div>
 
               {/* Signature */}
@@ -182,7 +195,7 @@ export default function AboutMeSection() {
                   "Elevarte es un espacio seguro de sanación, cambio y autoconocimiento"
                 </p>
                 <p className="text-[#8B4513] font-DMSans font-bold text-lg flex items-center gap-2">
-                  Con cariño, Camila 
+                  Con cariño, Camila
                 </p>
               </div>
             </div>

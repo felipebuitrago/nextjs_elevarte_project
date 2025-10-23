@@ -9,8 +9,8 @@ export default function DockNavigation() {
     { icon: User2, label: 'Sobre Mí', id: 'about-section' },
     { icon: HandHeart, label: 'Servicios', id: 'services-section' },
     { icon: Home, label: 'Inicio', id: 'hero-section', isCenter: true },
-    { icon: Podcast, label: 'Contenido', id: 'content-section' },
     { icon: GraduationCap, label: 'Formación', id: 'courses-section' },
+    { icon: Podcast, label: 'Contenido', id: 'content-section' },
   ];
 
   const handleNavClick = (id: string) => {
@@ -87,7 +87,7 @@ export default function DockNavigation() {
                 <div
                   className={`
                     flex items-center justify-center rounded-xl
-                    transition-all duration-300
+                    transition-all duration-300  cursor-pointer
                     ${isCenter
                       ? 'w-14 h-14 bg-gradient-to-br from-amber-600 to-amber-800 shadow-lg shadow-amber-800/50'
                       : 'w-12 h-12'

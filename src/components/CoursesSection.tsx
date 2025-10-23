@@ -305,7 +305,7 @@ export default function Cursos() {
           {/* Bottom CTA */}
           <div className="text-center mt-16">
             <p className="text-amber-800/70 text-lg mb-6 font-DMSans">
-              ¿Primera vez en prácticas energéticas?
+              ¿Aprendiendo sobre terapias energéticas por primera vez?
             </p>
             <button className="px-8 py-4 bg-white/40 backdrop-blur-sm text-amber-900 rounded-full font-Zain font-bold text-xl border-2 border-white/60 hover:bg-white/60 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
               Comienza con Desarrollo Intuitivo

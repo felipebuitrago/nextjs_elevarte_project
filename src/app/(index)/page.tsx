@@ -14,8 +14,8 @@ export default function HomePage() {
       <HeroSection />
       <AboutMeSection />
       <ServiceSection />
-      <PodcastBlogSection />
       <CoursesSection />
+      <PodcastBlogSection />
       <FooterSection />
     </div>
   )

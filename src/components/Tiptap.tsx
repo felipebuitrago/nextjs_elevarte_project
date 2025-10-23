@@ -16,7 +16,8 @@ import Strike from '@tiptap/extension-strike'
 
 import { 
   Bold as LucideBold, Italic as LucideItalic, Underline as LucideUnderline, Strikethrough, List, ListOrdered, Quote, Undo, Redo, AlignLeft, AlignCenter,
-  AlignRight, AlignJustify, Highlighter, ImageIcon, Link2, Table2, Heading1, Heading2, Heading3, Code
+  AlignRight, AlignJustify, Highlighter, ImageIcon, Link2, Table2, Heading1, Heading2, Heading3, Code,
+  Send
 } from 'lucide-react'
 
 const Tiptap = () => {
@@ -222,6 +223,10 @@ const Tiptap = () => {
         <div className="bg-white rounded-b-lg p-4 min-h-[400px]">
           <EditorContent editor={editor} />
         </div>
+      </div>
+      <div className='w-full justify-end flex gap-4 mt-4'>
+        <button className='p-3 bg-amber-50 border-md rounded cursor-pointer hover:bg-amber-100 transition-all font-Zain text-xl'>Guardar</button>
+        <button className='flex group items-center p-3 bg-amber-200 border-md rounded cursor-pointer hover:bg-amber-700 transition-all font-Zain text-xl'>Publicar <Send className='w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform'/> </button>
       </div>
     </div>
   )
