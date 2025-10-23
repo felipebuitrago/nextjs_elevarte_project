@@ -1,26 +1,49 @@
+@font-face {
+  font-family: 'DMSans';
+  src: url('../assets/fonts/DMSans.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap; /* Para mejor rendimiento */
+}
+
+@font-face {
+  font-family: 'Dongle-Regular';
+  src: url('../assets/fonts/Dongle-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Zain-Light';
+  src: url('../assets/fonts/Zain-Light.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Zain-Regular';
+  src: url('../assets/fonts/Zain-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Zain-Bold';
+  src: url('../assets/fonts/Zain-Bold.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme{
+    --font-DMSans: 'DMSans', sans-serif;
+    --font-Dongle: 'Dongle-Regular', sans-serif;
+    --font-Zain: 'Zain-Regular', sans-serif;
+    --font-Zain-Bold: 'Zain-Bold', sans-serif;
+    --font-Zain-Light: 'Zain-Light', sans-serif;
 }
