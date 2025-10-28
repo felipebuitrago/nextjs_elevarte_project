@@ -2,6 +2,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
+import db from '@/lib/db'
+import { TagActiveSwitch } from '@/components/ui/TagActiveSwitch'
 
 export default async function TagsPage() {
   const supabase = await createClient()
@@ -12,10 +14,15 @@ export default async function TagsPage() {
   }
 
   // Obtener tags de la base de datos
-  const { data: tags, error } = await supabase
-    .from('tags')
-    .select('*')
-    .order('created_at', { ascending: false })
+  const tags = await db.tag.findMany({
+    select: { 
+      id: true, 
+      name: true, 
+      slug: true, 
+      active: true 
+    }, 
+    orderBy: { name: 'asc' }
+  })
 
   return (
     <div className='p-8'>
@@ -30,10 +37,12 @@ export default async function TagsPage() {
           </svg>
           <span className="text-lg font-DMSans">Volver al Dashboard</span>
         </Link>
-        
-        <button className="px-6 py-3 bg-amber-900 text-white rounded-2xl font-DMSans hover:bg-amber-800 transition-all duration-300 hover:scale-105 shadow-lg">
+        <Link
+          href="/dashboard/tags/nuevo"
+          className="px-6 py-3 bg-amber-900 text-white rounded-2xl font-DMSans hover:bg-amber-800 transition-all duration-300 hover:scale-105 shadow-lg"
+        >
           + Nueva Tag
-        </button>
+        </Link>
       </div>
 
       {/* Title */}
@@ -51,8 +60,7 @@ export default async function TagsPage() {
                 <tr className="border-b border-amber-900/10">
                   <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Nombre</th>
                   <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Slug</th>
-                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Posts</th>
-                  <th className="text-right p-6 text-amber-900 font-DMSans font-semibold">Acciones</th>
+                  <th className="text-right p-6 text-amber-900 font-DMSans font-semibold">Activo</th>
                 </tr>
               </thead>
               <tbody>
@@ -61,22 +69,17 @@ export default async function TagsPage() {
                     <tr key={tag.id} className="border-b border-amber-900/5 hover:bg-white/20 transition-colors duration-200">
                       <td className="p-6 text-amber-900 font-DMSans">{tag.name}</td>
                       <td className="p-6 text-amber-700/60 font-DMSans">{tag.slug}</td>
-                      <td className="p-6 text-amber-700/60 font-DMSans">{tag.post_count || 0}</td>
-                      <td className="p-6">
-                        <div className="flex gap-3 justify-end">
-                          <button className="px-4 py-2 bg-white/50 text-amber-900 rounded-xl font-DMSans hover:bg-white/70 transition-all duration-300 border border-white/40">
-                            Editar
-                          </button>
-                          <button className="px-4 py-2 bg-amber-900/10 text-amber-900 rounded-xl font-DMSans hover:bg-amber-900/20 transition-all duration-300 border border-amber-900/20">
-                            Ocultar
-                          </button>
-                        </div>
+                      <td className="p-6 text-right">
+                        <TagActiveSwitch 
+                          tagId={tag.id} 
+                          initialActive={tag.active} 
+                        />
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="p-12 text-center text-amber-700/60 font-DMSans">
+                    <td colSpan={3} className="p-12 text-center text-amber-700/60 font-DMSans">
                       No hay tags disponibles. ¡Crea tu primera tag!
                     </td>
                   </tr>

@@ -233,7 +233,7 @@ export default function AboutMeSection() {
             {/* Fixed Close button - stays on top during scroll */}
             <button
               onClick={() => setOpenModal(false)}
-              className="absolute right-0 p-3 z-[9999] rounded-full bg-white/90 hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg border border-white/50 cursor-pointer"
+              className="relative right-0 p-3 z-[9999] rounded-full bg-white/90 hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg border border-white/50 cursor-pointer"
             >
               <X className="w-5 h-5 text-amber-900" />
             </button>
@@ -267,7 +267,7 @@ export default function AboutMeSection() {
               </div>
 
               {/* Body - Content with styled paragraphs */}
-              <div className="p-5 md:p-12 space-y-6">
+              <div className="p-5 md:p-12 space-y-6  mb-12 md:mt-[-27px]">
                 {/* Content card */}
                 <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-6 md:p-10 border border-white/50 shadow-lg space-y-6">
                   <p className="text-amber-900 font-DMSans leading-relaxed text-lg">

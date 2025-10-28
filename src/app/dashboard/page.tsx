@@ -38,7 +38,6 @@ export default async function PrivatePage() {
     <div className='flex flex-col items-center justify-center p-4'>
       <div className="mb-12 text-center space-y-1">
         <h1 className="text-5xl font-DMSans text-amber-900">Dashboard</h1>
-        <h2 className="text-lg text-amber-700/60">Hola, {data.user.user_metadata.full_name}</h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-12 max-w-6xl">
         {options.map((option, index) => {
