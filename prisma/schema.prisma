@@ -50,3 +50,17 @@ model Post {
   @@index([publishedAt])
   @@schema("public")
 }
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  body      String
+  rating    Int      @default(5)
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published])
+  @@index([createdAt])
+  @@schema("public")
+}

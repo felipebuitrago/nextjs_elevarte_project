@@ -4,6 +4,7 @@ import FooterSection from "@/components/FooterSection";
 import HeroSection from "@/components/HeroSection";
 import PodcastBlogSection from "@/components/PodcastBlogSection";
 import ServiceSection from "@/components/ServicesSection";
+import TestimonialsSection from "@/components/TestimonialsSection";
 import DockNavigation from "@/components/ui/DockNavigation";
 
 export default function HomePage() {
@@ -15,6 +16,7 @@ export default function HomePage() {
       <AboutMeSection />
       <ServiceSection />
       <CoursesSection />
+      <TestimonialsSection />
       <PodcastBlogSection />
       <FooterSection />
     </div>

@@ -197,7 +197,7 @@ export default function AboutMeSection() {
           </div>
           {/* Click to view more hint */}
           <div className="text-center pt-6 text-sm text-[#8B4513]/60 font-Zain group-hover:text-[#8B4513] group-hover:scale-105 transition-all">
-            Click para ver más información →
+            Toca para ver más información →
           </div>
         </div>
       </div>
