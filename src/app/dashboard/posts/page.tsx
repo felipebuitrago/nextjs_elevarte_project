@@ -55,10 +55,9 @@ export default async function PostsPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-amber-900/10">
+                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Portada</th>
                   <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Título</th>
-                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Slug</th>
-                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Resumen</th>
-                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Creado</th>
+                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Publicado</th>
                   <th className="text-right p-6 text-amber-900 font-DMSans font-semibold">Acciones</th>
                 </tr>
               </thead>
@@ -66,13 +65,18 @@ export default async function PostsPage() {
                 {posts && posts.length > 0 ? (
                   posts.map((post) => (
                     <tr key={post.id} className="border-b border-amber-900/5 hover:bg-white/20 transition-colors duration-200">
-                      <td className="p-6 text-amber-900 font-DMSans max-w-xs truncate">{post.title}</td>
-                      <td className="p-6 text-amber-700/60 font-DMSans">{post.slug}</td>
-                      <td className="p-6 text-amber-700/60 font-DMSans">{post.excerpt}</td>
-                      <td className="p-6 text-amber-700/60 font-DMSans">
-                        {new Date(post.createdAt).toLocaleDateString('es-ES')}
+                      <td className="p-6 max-w-xs truncate">
+                        <img
+                          src={post.coverImage || ""}
+                          alt=""
+                          style={{ maxWidth: '50px', maxHeight: '50px', width: 'auto', height: 'auto' }}
+                        />
                       </td>
-                      <td className="p-6 text-amber-700/60 font-DMSans flex">
+                      <td className="p-6 text-amber-900 font-DMSans max-w-xs truncate">{post.title}</td>
+                      <td className="p-6 text-amber-700/60 font-DMSans">
+                        {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('es-ES') : 'No publicado'}
+                      </td>
+                      <td className="p-6 text-amber-700/60 font-DMSans flex justify-end">
                         <Link
                           href={`/dashboard/posts/editar?id=${post.id}`}
                           className="inline-flex items-center mr-6 p-2 rounded hover:bg-white/10 transition-colors"

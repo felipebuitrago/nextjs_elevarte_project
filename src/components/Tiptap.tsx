@@ -18,8 +18,11 @@ import {
   Bold as LucideBold, Italic as LucideItalic, Underline as LucideUnderline, Strikethrough, List, ListOrdered, Quote, Undo, Redo, AlignLeft, AlignCenter,
   AlignRight, AlignJustify, Highlighter, Heading1, Heading2, Heading3,
 } from 'lucide-react'
-import { useActionState, useState } from 'react'
 import { savePost } from '@/lib/actions/postActions'
+import { ChangeEvent, useRef, useTransition, useActionState, useState } from "react";
+import { convertBlobUrlToFile } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/client";
+import { v4 as uuidv4 } from "uuid";
 
 interface TiptapProps {
   tags?: { id: string; name: string }[]
@@ -27,6 +30,7 @@ interface TiptapProps {
 const Tiptap = ({ tags }: TiptapProps) => {
 
   const [htmlContent, setHtmlContent] = useState('')
+  const [coverImage, setCoverImage] = useState('')
 
   // Estados para ambas actions
   const [publishState, action, pending] = useActionState(savePost, null)
@@ -61,250 +65,359 @@ const Tiptap = ({ tags }: TiptapProps) => {
     },
   })
 
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [isPending, startTransition] = useTransition();
+
+  const supabase = createClient();
+
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const newImageUrl = URL.createObjectURL(file);
+      startTransition(async () => {
+        const imageFile = await convertBlobUrlToFile(newImageUrl);
+        const fileName = imageFile.name;
+        const fileExtension = fileName.slice(fileName.lastIndexOf(".") + 1);
+        const path = `${uuidv4()}.${fileExtension}`;
+
+        const { data, error } = await supabase.storage
+          .from("elevarte_imgs")
+          .upload(path, imageFile);
+
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        setCoverImage(`https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/${data.path}`);
+        setImageUrl(newImageUrl);
+        // Resetear el input
+        if (imageInputRef.current) {
+          imageInputRef.current.value = "";
+        }
+      });
+    }
+  };
+
   if (!editor) {
     return null
   }
 
   return (
-    <>
-      <div className="w-full max-w-6xl mx-auto px-4">
-        <form
-          action={action}
-          className="space-y-1"
-        >
-          {/* Campos del formulario */}
-          <div className="space-y-4 ">
-            <div>
-              <label htmlFor="title" className="block text-amber-900 font-DMSans font-semibold mb-2">Título</label>
-              <input
-                id="title"
-                name="title"
-                placeholder="Título del post"
-                required
-                disabled={pending}
-                className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
-              />
-            </div>
+    <div className="w-full max-w-6xl mx-auto">
+      <form
+        action={action}
+        className="space-y-1"
+      >
+        {/* Campos del formulario */}
+        <div className="space-y-4 ">
 
+          <div>
+            <label htmlFor="coverImage" className="block text-amber-900 font-DMSans font-semibold mb-2">Imagen de portada</label>
+            <input
+              id="coverImage"
+              name="coverImage"
+              className='hidden'
+              value={coverImage}
+              onChange={(e) => setCoverImage(e.target.value)}
+            />
             <div>
-              <label htmlFor="slug" className="block text-amber-900 font-DMSans font-semibold mb-2">Slug (URL)</label>
               <input
-                id="slug"
-                name="slug"
-                placeholder="titulo-del-post"
-                required
-                disabled={pending}
-                className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
+                type="file"
+                hidden
+                ref={imageInputRef}
+                onChange={handleImageChange}
+                disabled={isPending}
+                accept="image/*"
               />
-            </div>
 
-            <div>
-              <label htmlFor="excerpt" className="block text-amber-900 font-DMSans font-semibold mb-2">Extracto</label>
-              <input
-                id="excerpt"
-                name="excerpt"
-                placeholder="Breve descripción del post"
-                disabled={pending}
-                className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
-              />
-            </div>
-
-            <div>
-              <label htmlFor="coverImage" className="block text-amber-900 font-DMSans font-semibold mb-2">URL Imagen de portada</label>
-              <input
-                id="coverImage"
-                name="coverImage"
-                placeholder="https://..."
-                disabled={pending}
-                className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
-              />
-            </div>
-
-            <div>
-              <label htmlFor="tagId" className="block text-amber-900 font-DMSans font-semibold mb-2">Tag</label>
-              <select
-                id="tagId"
-                name="tagId"
-                disabled={pending}
-                className="px-3 py-2 border rounded-md"
+              <button
+                className="font-Zain bg-amber-900 p-2 w-40 rounded-lg text-white"
+                onClick={() => imageInputRef.current?.click()}
+                disabled={isPending}
               >
-                <option value="">Sin tag</option>
-                {tags && tags.map((tag) => (
-                  <option key={tag.id} value={tag.id}>{tag.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+                Seleccionar Imagen
+              </button>
 
-          {/* Hidden input para el contenido HTML */}
-          <input type="hidden" name="content" value={htmlContent} />
+              {isPending && <p>Subiendo imagen...</p>}
 
-          {/* Editor Tiptap */}
-          <div className="bg-white rounded-lg shadow-lg border border-gray-200">
-            {/* Toolbar */}
-            <div className="border-b border-gray-200 p-2 bg-gray-50 rounded-t-lg flex flex-wrap gap-1">
-              {/* Undo/Redo */}
-              <div className="flex gap-1 border-r border-gray-300 pr-2">
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Deshacer"
-                  onClick={() => editor.chain().focus().undo().run()} type="button"
-                >
-                  <Undo className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Rehacer"
-                  onClick={() => editor.chain().focus().redo().run()} type="button"
-                >
-                  <Redo className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Text Formatting */}
-              <div className="flex gap-1 border-r border-gray-300 pr-2">
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Negrita"
-                  onClick={() => editor.chain().focus().toggleBold().run()}
-                >
-                  <LucideBold className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Cursiva"
-                  onClick={() => editor.chain().focus().toggleItalic().run()}
-                >
-                  <LucideItalic className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Subrayado"
-                  onClick={() => editor.chain().focus().toggleUnderline().run()}
-                >
-                  <LucideUnderline className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Tachado"
-                  onClick={() => editor.chain().focus().toggleStrike().run()}
-                >
-                  <Strikethrough className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Resaltado"
-                  onClick={() => editor.chain().focus().toggleHighlight().run()}
-                >
-                  <Highlighter className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Headings */}
-              <div className="flex gap-1 border-r border-gray-300 pr-2">
-                <button
-                  title="Título 1"
-                  onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                  className={`{ p-2 rounded hover:bg-gray-200 transition-colors} ${editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}`}
-                >
-                  <Heading1 className="w-4 h-4" />
-                </button>
-                <button
-                  title="Título 2"
-                  onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                  className={`{ p-2 rounded hover:bg-gray-200 transition-colors} ${editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}`}
-                >
-                  <Heading2 className="w-4 h-4" />
-                </button>
-                <button
-                  title="Título 3"
-                  onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-                  className={`{ p-2 rounded hover:bg-gray-200 transition-colors} ${editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}`}
-                >
-                  <Heading3 className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Lists */}
-              <div className="flex gap-1 border-r border-gray-300 pr-2">
-                <button
-                  onClick={() => editor.chain().focus().toggleBulletList().run()}
-                  className={`p-2 rounded hover:bg-gray-200 transition-colors ${editor.isActive('bulletList') ? 'is-active' : ''}`}
-                  title="Lista con viñetas"
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Lista numerada"
-                  onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                >
-                  <ListOrdered className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                  className={`p-2 rounded hover:bg-gray-200 transition-colors ${editor.isActive('blockquote') ? 'is-active' : ''}`}
-                  title="Cita"
-                >
-                  <Quote className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Alignment */}
-              <div className="flex gap-1 border-r border-gray-300 pr-2">
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Alinear izquierda"
-                  onClick={() => editor.chain().focus().setTextAlign('left').run()}
-                >
-                  <AlignLeft className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Centrar"
-                  onClick={() => editor.chain().focus().setTextAlign('center').run()}
-                >
-                  <AlignCenter className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Alinear derecha"
-                  onClick={() => editor.chain().focus().setTextAlign('right').run()}
-                >
-                  <AlignRight className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 rounded hover:bg-gray-200 transition-colors"
-                  title="Justificar"
-                  onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-                >
-                  <AlignJustify className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Editor Area */}
-            <div className="bg-white rounded-b-lg p-4 min-h-[400px]">
-              <EditorContent editor={editor} />
-            </div>
-          </div>
-
-          {/* Botones de acción */}
-          <div className="flex justify-end gap-3">
-            <button
-              type="submit"
-              disabled={pending}
-              className="p-3 h-full bg-amber-800 text-white text-lg rounded-lg font-Zain hover:bg-amber-900 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer"
-            >
-              {pending ? 'Guardando...' : (
-                'Guardar'
+              {imageUrl && (
+                <div className="flex mt-4">
+                  <img
+                    src={imageUrl}
+                    style={{ maxWidth: '300px', maxHeight: '300px', width: 'auto', height: 'auto' }}
+                    alt="imagen-seleccionada"
+                  />
+                </div>
               )}
-            </button>
+
+            </div>
           </div>
-        </form>
-      </div>
-      
-    </>
+
+          <div>
+            <label htmlFor="title" className="block text-amber-900 font-DMSans font-semibold mb-2">Título</label>
+            <input
+              id="title"
+              name="title"
+              placeholder="Título del post"
+              required
+              disabled={pending}
+              className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
+            />
+          </div>
+
+          <div>
+            <label htmlFor="slug" className="block text-amber-900 font-DMSans font-semibold mb-2">Slug (URL)</label>
+            <input
+              id="slug"
+              name="slug"
+              placeholder="titulo-del-post"
+              required
+              disabled={pending}
+              className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
+            />
+          </div>
+
+          <div>
+            <label htmlFor="excerpt" className="block text-amber-900 font-DMSans font-semibold mb-2">Extracto</label>
+            <input
+              id="excerpt"
+              name="excerpt"
+              placeholder="Breve descripción del post"
+              disabled={pending}
+              className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
+            />
+          </div>
+
+          <div>
+            <label htmlFor="tagId" className="block text-amber-900 font-DMSans font-semibold mb-2">Tag</label>
+            <select
+              id="tagId"
+              name="tagId"
+              disabled={pending}
+              className="px-3 py-2 border rounded-md"
+            >
+              <option value="">Sin tag</option>
+              {tags && tags.map((tag) => (
+                <option key={tag.id} value={tag.id}>{tag.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Hidden input para el contenido HTML */}
+        <input type="hidden" name="content" value={htmlContent} />
+
+        {/* Editor Tiptap */}
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+          {/* Toolbar */}
+          <div className="border-b border-gray-200 p-2 bg-gray-50 rounded-t-lg flex flex-wrap gap-1">
+            {/* Undo/Redo */}
+            <div className="flex gap-1 border-r border-gray-300 pr-2">
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Deshacer"
+                onClick={() => editor.chain().focus().undo().run()} type="button"
+              >
+                <Undo className="w-4 h-4" />
+              </button>
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Rehacer"
+                onClick={() => editor.chain().focus().redo().run()} type="button"
+              >
+                <Redo className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Text Formatting */}
+            <div className="flex gap-1 border-r border-gray-300 pr-2">
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Negrita"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleBold().run();
+                }}
+              >
+                <LucideBold className="w-4 h-4" />
+              </button>
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Cursiva"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleItalic().run();
+                }}
+              >
+                <LucideItalic className="w-4 h-4" />
+              </button>
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Subrayado"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleUnderline().run();
+                }}
+              >
+                <LucideUnderline className="w-4 h-4" />
+              </button>
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Tachado"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleStrike().run();
+                }}
+              >
+                <Strikethrough className="w-4 h-4" />
+              </button>
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Resaltado"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleHighlight().run();
+                }}
+              >
+                <Highlighter className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Headings */}
+            <div className="flex gap-1 border-r border-gray-300 pr-2">
+              <button
+                title="Título 1"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleHeading({ level: 1 }).run();
+                }}
+                className={`{ p-2 rounded hover:bg-gray-200 transition-colors} ${editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}`}
+              >
+                <Heading1 className="w-4 h-4" />
+              </button>
+              <button
+                title="Título 2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleHeading({ level: 2 }).run();
+                }}
+                className={`{ p-2 rounded hover:bg-gray-200 transition-colors} ${editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}`}
+              >
+                <Heading2 className="w-4 h-4" />
+              </button>
+              <button
+                title="Título 3"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleHeading({ level: 3 }).run();
+                }}
+                className={`{ p-2 rounded hover:bg-gray-200 transition-colors} ${editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}`}
+              >
+                <Heading3 className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Lists */}
+            <div className="flex gap-1 border-r border-gray-300 pr-2">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleBulletList().run();
+                }}
+                className={`p-2 rounded hover:bg-gray-200 transition-colors ${editor.isActive('bulletList') ? 'is-active' : ''}`}
+                title="Lista con viñetas"
+              >
+                <List className="w-4 h-4" />
+              </button>
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Lista numerada"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleOrderedList().run();
+                }}
+              >
+                <ListOrdered className="w-4 h-4" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleBlockquote().run();
+                }}
+                className={`p-2 rounded hover:bg-gray-200 transition-colors ${editor.isActive('blockquote') ? 'is-active' : ''}`}
+                title="Cita"
+              >
+                <Quote className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Alignment */}
+            <div className="flex gap-1 border-r border-gray-300 pr-2">
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Alinear izquierda"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().setTextAlign('left').run();
+                }}
+              >
+                <AlignLeft className="w-4 h-4" />
+              </button>
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Centrar"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().setTextAlign('center').run();
+                }}
+              >
+                <AlignCenter className="w-4 h-4" />
+              </button>
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Alinear derecha"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().setTextAlign('right').run();
+                }}
+              >
+                <AlignRight className="w-4 h-4" />
+              </button>
+              <button
+                className="p-2 rounded hover:bg-gray-200 transition-colors"
+                title="Justificar"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().setTextAlign('justify').run();
+                }}
+              >
+                <AlignJustify className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Editor Area */}
+          <div className="bg-white rounded-b-lg px-2 min-h-[400px]">
+            <EditorContent editor={editor} />
+          </div>
+        </div>
+
+        {/* Botones de acción */}
+        <div className="flex justify-end gap-3">
+          <button
+            type="submit"
+            disabled={pending}
+            className="p-3 h-full bg-amber-800 text-white text-lg rounded-lg font-Zain hover:bg-amber-900 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer"
+          >
+            {pending ? 'Guardando...' : (
+              'Guardar'
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
   )
 }
 

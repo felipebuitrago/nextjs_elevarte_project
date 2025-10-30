@@ -13,8 +13,7 @@ export async function savePost(prevState: any, formData: FormData) {
         excerpt: formData.get('excerpt') as string,
         coverImage: formData.get('coverImage') as string,
         content: htmlContent,
-        published: true,
-        publishedAt: new Date(),
+        published: false,
         tagId: formData.get('tagId') as string || null,
       }
     });
@@ -28,7 +27,10 @@ export async function togglePostPublished(id: string, newValue: boolean): Promis
   try {
     await db.post.update({
       where: { id },
-      data: { published: newValue }
+      data: { 
+        published: newValue,
+        publishedAt: newValue ? new Date() : null,
+      }
     })
 
     // Revalidar la página para reflejar los cambios
