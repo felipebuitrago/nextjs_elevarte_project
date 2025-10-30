@@ -128,6 +128,9 @@ export async function toggleTagActive(tagId: string, active: boolean) {
     return { success: true }
   } catch (error) {
     console.error('Error updating tag:', error)
-    throw new Error('No se pudo actualizar la tag')
+    return {
+      success: false,
+      message: 'Error al actualizar la tag. Por favor intenta de nuevo.'
+    }
   }
 }

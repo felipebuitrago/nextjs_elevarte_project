@@ -51,14 +51,14 @@ export default function NewTagPage() {
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          <span className="text-lg font-DMSans">Volver a Tags</span>
+          <span className="text-lg font-DMSans">Volver</span>
         </Link>
       </div>
 
       <div className='max-w-6xl mx-auto'>
 
         {/* Title */}
-        <div className="max-w-2xl mx-auto mb-8">
+        <div className="mb-8">
           <h1 className="text-5xl font-Dongle text-amber-900">Nueva Tag</h1>
           <p className="text-lg text-amber-700/60 font-DMSans">Crea una nueva etiqueta para tus posts</p>
         </div>
@@ -144,7 +144,7 @@ export default function NewTagPage() {
                 <button
                   type="submit"
                   disabled={isPending || !name || !slug}
-                  className="flex-2 px-6 py-3 bg-amber-900 text-white rounded-2xl font-DMSans hover:bg-amber-800 transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="px-6 py-3 bg-amber-900 text-white rounded-2xl font-DMSans hover:bg-amber-800 transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   {isPending ? 'Creando...' : 'Crear Tag'}
                 </button>
