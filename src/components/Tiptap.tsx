@@ -16,22 +16,20 @@ import Strike from '@tiptap/extension-strike'
 
 import {
   Bold as LucideBold, Italic as LucideItalic, Underline as LucideUnderline, Strikethrough, List, ListOrdered, Quote, Undo, Redo, AlignLeft, AlignCenter,
-  AlignRight, AlignJustify, Highlighter, ImageIcon, Link2, Table2, Heading1, Heading2, Heading3,
+  AlignRight, AlignJustify, Highlighter, Heading1, Heading2, Heading3,
 } from 'lucide-react'
 import { useActionState, useState } from 'react'
-import { saveAndCreatePost, saveAsDraft } from '@/app/blog/new/actions'
+import { savePost } from '@/lib/actions/postActions'
 
-const Tiptap = () => {
+interface TiptapProps {
+  tags?: { id: string; name: string }[]
+}
+const Tiptap = ({ tags }: TiptapProps) => {
 
   const [htmlContent, setHtmlContent] = useState('')
-  const [actionType, setActionType] = useState<'publish' | 'draft'>('publish')
 
   // Estados para ambas actions
-  const [publishState, publishAction, publishPending] = useActionState(saveAndCreatePost, null)
-  const [draftState, draftAction, draftPending] = useActionState(saveAsDraft, null)
-
-  // El pending combinado para deshabilitar el form
-  const isPending = publishPending || draftPending
+  const [publishState, action, pending] = useActionState(savePost, null)
 
   const editor = useEditor({
     extensions: [
@@ -55,16 +53,7 @@ const Tiptap = () => {
         types: ['heading', 'paragraph'],
       }),
     ],
-    content: `
-      <blockquote>
-        Nothing is impossible, the word itself says “I’m possible!”
-      </blockquote>
-      <p>Audrey Hepburn</p>
-      <ul>
-          <li>A list item</li>
-          <li>And another one</li>
-        </ul>
-    `,
+    content: ``,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       // Actualizar el HTML cada vez que cambia el contenido
@@ -78,85 +67,71 @@ const Tiptap = () => {
 
   return (
     <>
-      <div className="w-full max-w-6xl mx-auto px-4 py-8">
+      <div className="w-full max-w-6xl mx-auto px-4">
         <form
-          action={(formData) => {
-            // Añadir el contenido HTML al FormData
-            formData.set('content', htmlContent)
-
-            // Ejecutar la action según el tipo
-            if (actionType === 'publish') {
-              publishAction(formData)
-            } else {
-              draftAction(formData)
-            }
-          }}
-          className="space-y-6"
+          action={action}
+          className="space-y-1"
         >
           {/* Campos del formulario */}
-          <div className="space-y-4 bg-white rounded-lg shadow-lg border border-gray-200 p-6">
+          <div className="space-y-4 ">
             <div>
-              <label htmlFor="title">Título</label>
+              <label htmlFor="title" className="block text-amber-900 font-DMSans font-semibold mb-2">Título</label>
               <input
                 id="title"
                 name="title"
                 placeholder="Título del post"
                 required
-                disabled={isPending}
+                disabled={pending}
+                className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
               />
             </div>
 
             <div>
-              <label htmlFor="slug">Slug (URL)</label>
-              <input
-                id="slug"
-                name="slug"
-                placeholder="titulo-del-post"
-                className="text-2xl font-bold"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="slug">Slug (URL)</label>
+              <label htmlFor="slug" className="block text-amber-900 font-DMSans font-semibold mb-2">Slug (URL)</label>
               <input
                 id="slug"
                 name="slug"
                 placeholder="titulo-del-post"
                 required
-                disabled={isPending}
+                disabled={pending}
+                className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
               />
             </div>
 
             <div>
-              <label htmlFor="excerpt">Extracto</label>
+              <label htmlFor="excerpt" className="block text-amber-900 font-DMSans font-semibold mb-2">Extracto</label>
               <input
                 id="excerpt"
                 name="excerpt"
                 placeholder="Breve descripción del post"
-                disabled={isPending}
+                disabled={pending}
+                className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
               />
             </div>
 
             <div>
-              <label htmlFor="coverImage">URL Imagen de portada</label>
+              <label htmlFor="coverImage" className="block text-amber-900 font-DMSans font-semibold mb-2">URL Imagen de portada</label>
               <input
                 id="coverImage"
                 name="coverImage"
                 placeholder="https://..."
-                disabled={isPending}
+                disabled={pending}
+                className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
               />
             </div>
 
             <div>
-              <label htmlFor="tagId">Tag</label>
+              <label htmlFor="tagId" className="block text-amber-900 font-DMSans font-semibold mb-2">Tag</label>
               <select
                 id="tagId"
                 name="tagId"
-                disabled={isPending}
-                className="w-full px-3 py-2 border rounded-md"
+                disabled={pending}
+                className="px-3 py-2 border rounded-md"
               >
                 <option value="">Sin tag</option>
-                {/* Aquí mapearías tus tags */}
+                {tags && tags.map((tag) => (
+                  <option key={tag.id} value={tag.id}>{tag.name}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -306,19 +281,6 @@ const Tiptap = () => {
                   <AlignJustify className="w-4 h-4" />
                 </button>
               </div>
-
-              {/* Insert */}
-              <div className="flex gap-1">
-                <button className="p-2 rounded hover:bg-gray-200 transition-colors" title="Insertar enlace">
-                  <Link2 className="w-4 h-4" />
-                </button>
-                <button className="p-2 rounded hover:bg-gray-200 transition-colors" title="Insertar imagen">
-                  <ImageIcon className="w-4 h-4" />
-                </button>
-                <button className="p-2 rounded hover:bg-gray-200 transition-colors" title="Insertar tabla">
-                  <Table2 className="w-4 h-4" />
-                </button>
-              </div>
             </div>
 
             {/* Editor Area */}
@@ -331,23 +293,11 @@ const Tiptap = () => {
           <div className="flex justify-end gap-3">
             <button
               type="submit"
-              disabled={isPending}
-              onClick={() => setActionType('draft')}
+              disabled={pending}
               className="p-3 h-full bg-amber-800 text-white text-lg rounded-lg font-Zain hover:bg-amber-900 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer"
             >
-              {draftPending ? 'Guardando...' : (
-                'Guardar Borrador'
-              )}
-            </button>
-
-            <button
-              type="submit"
-              disabled={isPending}
-              onClick={() => setActionType('publish')}
-              className="p-3 h-full bg-amber-800 text-white text-lg rounded-lg font-Zain hover:bg-amber-900 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl cursor-pointer"
-            >
-              {publishPending ? 'Publicando...' : (
-                'Publicar'
+              {pending ? 'Guardando...' : (
+                'Guardar'
               )}
             </button>
           </div>

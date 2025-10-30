@@ -2,6 +2,9 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
+import db from '@/lib/db'
+import { Edit } from 'lucide-react'
+import { PostPublishedSwitch } from '@/components/ui/PostPublishedSwitch'
 
 export default async function PostsPage() {
   const supabase = await createClient()
@@ -12,10 +15,11 @@ export default async function PostsPage() {
   }
 
   // Obtener posts de la base de datos
-  const { data: posts, error } = await supabase
-    .from('posts')
-    .select('*')
-    .order('created_at', { ascending: false })
+  const posts = await db.post.findMany({
+    orderBy: {
+      updatedAt: 'desc',
+    },
+  })
 
   return (
     <div className='p-8'>
@@ -31,9 +35,11 @@ export default async function PostsPage() {
           <span className="text-lg font-DMSans">Volver al Dashboard</span>
         </Link>
         
-        <button className="px-6 py-3 bg-amber-900 text-white rounded-2xl font-DMSans hover:bg-amber-800 transition-all duration-300 hover:scale-105 shadow-lg">
+        <Link
+          href="/dashboard/posts/nuevo"
+          className="px-6 py-3 bg-amber-900 text-white rounded-2xl font-DMSans hover:bg-amber-800 transition-all duration-300 hover:scale-105 shadow-lg">
           + Nuevo Post
-        </button>
+        </Link>
       </div>
 
       {/* Title */}
@@ -50,9 +56,9 @@ export default async function PostsPage() {
               <thead>
                 <tr className="border-b border-amber-900/10">
                   <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Título</th>
-                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Autor</th>
-                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Fecha</th>
-                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Estado</th>
+                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Slug</th>
+                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Resumen</th>
+                  <th className="text-left p-6 text-amber-900 font-DMSans font-semibold">Creado</th>
                   <th className="text-right p-6 text-amber-900 font-DMSans font-semibold">Acciones</th>
                 </tr>
               </thead>
@@ -61,28 +67,23 @@ export default async function PostsPage() {
                   posts.map((post) => (
                     <tr key={post.id} className="border-b border-amber-900/5 hover:bg-white/20 transition-colors duration-200">
                       <td className="p-6 text-amber-900 font-DMSans max-w-xs truncate">{post.title}</td>
-                      <td className="p-6 text-amber-700/60 font-DMSans">{post.author || 'Admin'}</td>
+                      <td className="p-6 text-amber-700/60 font-DMSans">{post.slug}</td>
+                      <td className="p-6 text-amber-700/60 font-DMSans">{post.excerpt}</td>
                       <td className="p-6 text-amber-700/60 font-DMSans">
-                        {new Date(post.created_at).toLocaleDateString('es-ES')}
+                        {new Date(post.createdAt).toLocaleDateString('es-ES')}
                       </td>
-                      <td className="p-6">
-                        <span className={`px-3 py-1 rounded-full text-sm font-DMSans ${
-                          post.published 
-                            ? 'bg-green-100 text-green-800 border border-green-200' 
-                            : 'bg-amber-100 text-amber-800 border border-amber-200'
-                        }`}>
-                          {post.published ? 'Publicado' : 'Borrador'}
-                        </span>
-                      </td>
-                      <td className="p-6">
-                        <div className="flex gap-3 justify-end">
-                          <button className="px-4 py-2 bg-white/50 text-amber-900 rounded-xl font-DMSans hover:bg-white/70 transition-all duration-300 border border-white/40">
-                            Editar
-                          </button>
-                          <button className="px-4 py-2 bg-amber-900/10 text-amber-900 rounded-xl font-DMSans hover:bg-amber-900/20 transition-all duration-300 border border-amber-900/20">
-                            Ocultar
-                          </button>
-                        </div>
+                      <td className="p-6 text-amber-700/60 font-DMSans flex">
+                        <Link
+                          href={`/dashboard/posts/editar?id=${post.id}`}
+                          className="inline-flex items-center mr-6 p-2 rounded hover:bg-white/10 transition-colors"
+                          aria-label="Editar post"
+                        >
+                          <Edit className="w-5 h-5 text-amber-900 hover:text-amber-700" />
+                        </Link>
+                        <PostPublishedSwitch
+                          postId={post.id}
+                          initialActive={post.published}
+                        />
                       </td>
                     </tr>
                   ))

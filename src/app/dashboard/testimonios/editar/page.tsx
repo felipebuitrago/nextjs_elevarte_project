@@ -1,5 +1,4 @@
 import EditTestimonialPage from '@/components/EditTestimonialPage';
-import BlogListView from '@/components/ui/BlogListView'
 import db from '@/lib/db'
 
 export default async function EditTestimonial(props: {
