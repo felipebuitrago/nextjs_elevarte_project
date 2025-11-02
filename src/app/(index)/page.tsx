@@ -11,6 +11,20 @@ import db from "@/lib/db";
 export default async function HomePage() {
 
   const testimonials = await db.testimonial.findMany();
+  const posts = await db.post.findMany({
+    where: {
+      published: true
+    },
+    include: {
+      tag: true
+    },
+    orderBy: {
+      publishedAt: 'desc'
+    },
+    take: 3
+  })
+
+  console.log(posts)
 
   return (
     <div className='bg-gradient-to-br from-[#d4c4b0] via-[#c9b59a] to-[#b8a589]'>
@@ -20,8 +34,8 @@ export default async function HomePage() {
       <AboutMeSection />
       <ServiceSection />
       <CoursesSection />
-      <TestimonialsSection testimonials={testimonials}/>
-      <PodcastBlogSection />
+      <TestimonialsSection testimonials={testimonials} />
+      <PodcastBlogSection posts={posts}/>
       <FooterSection />
     </div>
   )

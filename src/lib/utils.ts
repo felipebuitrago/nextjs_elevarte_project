@@ -15,3 +15,11 @@ export async function convertBlobUrlToFile(blobUrl: string) {
   });
   return file;
 }
+
+export const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat('es', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(new Date(date))
+}

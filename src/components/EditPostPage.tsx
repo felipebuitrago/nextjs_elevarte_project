@@ -18,28 +18,32 @@ import {
   Bold as LucideBold, Italic as LucideItalic, Underline as LucideUnderline, Strikethrough, List, ListOrdered, Quote, Undo, Redo, AlignLeft, AlignCenter,
   AlignRight, AlignJustify, Highlighter, Heading1, Heading2, Heading3,
 } from 'lucide-react'
-import { useActionState, useState } from 'react'
-import { savePost } from '@/lib/actions/postActions'
+import { ChangeEvent, useActionState, useEffect, useRef, useState, useTransition } from 'react'
+import { updatePost } from '@/lib/actions/postActions'
+import { convertBlobUrlToFile } from '@/lib/utils'
+import { createClient } from "@/utils/supabase/client";
+import { v4 as uuidv4 } from "uuid";
 
 interface TiptapProps {
   tags?: { id: string; name: string }[];
-  post: { 
-      id: string,
-      title: string,
-      slug: string,
-      coverImage: string,
-      tagId: string | null,
-      content: string,
-      excerpt: string,
-      published: boolean,
+  post: {
+    id: string,
+    title: string,
+    slug: string,
+    coverImage: string,
+    tagId: string | null,
+    content: string,
+    excerpt: string,
+    published: boolean,
   }
 }
 const EditPostPage = ({ tags, post }: TiptapProps) => {
 
-  const [htmlContent, setHtmlContent] = useState('')
+  const [htmlContent, setHtmlContent] = useState(post.content)
+  const [coverImage, setCoverImage] = useState(post.coverImage)
 
   // Estados para ambas actions
-  const [state, action, pending] = useActionState(savePost, null)
+  const [state, action, pending] = useActionState(updatePost, null)
 
   const editor = useEditor({
     extensions: [
@@ -63,7 +67,7 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
         types: ['heading', 'paragraph'],
       }),
     ],
-    content: post?.content || '',
+    content: post.content,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       // Actualizar el HTML cada vez que cambia el contenido
@@ -71,27 +75,119 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
     },
   })
 
+  const [imageUrl, setImageUrl] = useState<string>(post.coverImage);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [isPending, startTransition] = useTransition();
+
+  const supabase = createClient();
+
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const newImageUrl = URL.createObjectURL(file);
+      startTransition(async () => {
+        const imageFile = await convertBlobUrlToFile(newImageUrl);
+        const fileName = imageFile.name;
+        const fileExtension = fileName.slice(fileName.lastIndexOf(".") + 1);
+        const path = `${uuidv4()}.${fileExtension}`;
+
+        const { data, error } = await supabase.storage
+          .from("elevarte_imgs")
+          .upload(path, imageFile);
+
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        setCoverImage(`https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/${data.path}`);
+        setImageUrl(newImageUrl);
+        // Resetear el input
+        if (imageInputRef.current) {
+          imageInputRef.current.value = "";
+        }
+      });
+    }
+  };
+
+  useEffect(() => {
+  if (editor && !htmlContent) {
+    setHtmlContent(editor.getHTML())
+  }
+}, [editor])
+
   if (!editor) {
     return null
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4">
+    <div className="w-full max-w-6xl mx-auto">
       <form
         action={action}
         className="space-y-1"
       >
+        <input
+          type="text"
+          hidden
+          id='postId'
+          name='postId'
+          defaultValue={post.id}
+        />
         {/* Campos del formulario */}
         <div className="space-y-4 ">
+
+          <div>
+            <label htmlFor="coverImage" className="block text-amber-900 font-DMSans font-semibold mb-2">Imagen de portada</label>
+            <input
+              id="coverImage"
+              name="coverImage"
+              className='hidden'
+              defaultValue={post.coverImage}
+              value={coverImage || post.coverImage}
+              onChange={(e) => setCoverImage(e.target.value)}
+            />
+            <div>
+              <input
+                type="file"
+                hidden
+                ref={imageInputRef}
+                onChange={handleImageChange}
+                disabled={isPending}
+                accept="image/*"
+              />
+
+              <button
+                className="font-Zain bg-amber-900 p-2 w-40 rounded-lg text-white"
+                onClick={() => imageInputRef.current?.click()}
+                disabled={isPending}
+              >
+                Seleccionar Imagen
+              </button>
+
+              {isPending && <p>Subiendo imagen...</p>}
+
+              {imageUrl && (
+                <div className="flex mt-4">
+                  <img
+                    src={imageUrl}
+                    style={{ maxWidth: '300px', maxHeight: '300px', width: 'auto', height: 'auto' }}
+                    alt="imagen-seleccionada"
+                  />
+                </div>
+              )}
+
+            </div>
+          </div>
+
           <div>
             <label htmlFor="title" className="block text-amber-900 font-DMSans font-semibold mb-2">Título</label>
             <input
               id="title"
               name="title"
-              defaultValue={post.title}
               placeholder="Título del post"
               required
               disabled={pending}
+              defaultValue={post.title}
               className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
             />
           </div>
@@ -102,9 +198,9 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
               id="slug"
               name="slug"
               placeholder="titulo-del-post"
-              defaultValue={post.slug}
               required
               disabled={pending}
+              defaultValue={post.slug}
               className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
             />
           </div>
@@ -115,20 +211,8 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
               id="excerpt"
               name="excerpt"
               placeholder="Breve descripción del post"
+              disabled={pending}
               defaultValue={post.excerpt}
-              disabled={pending}
-              className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
-            />
-          </div>
-
-          <div>
-            <label htmlFor="coverImage" className="block text-amber-900 font-DMSans font-semibold mb-2">URL Imagen de portada</label>
-            <input
-              id="coverImage"
-              name="coverImage"
-              placeholder="https://..."
-              defaultValue={post.coverImage}
-              disabled={pending}
               className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
             />
           </div>
@@ -139,8 +223,8 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
               id="tagId"
               name="tagId"
               disabled={pending}
-              defaultValue={post.tagId || ""}
               className="px-3 py-2 border rounded-md"
+              defaultValue={post.tagId || ""}
             >
               <option value="">Sin tag</option>
               {tags && tags.map((tag) => (
@@ -151,7 +235,7 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
         </div>
 
         {/* Hidden input para el contenido HTML */}
-        <input type="hidden" name="content" value={htmlContent} />
+        <input type="hidden" name="content" value={htmlContent || post.content} />
 
         {/* Editor Tiptap */}
         <div className="bg-white rounded-lg shadow-lg border border-gray-200">
@@ -180,35 +264,50 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
               <button
                 className="p-2 rounded hover:bg-gray-200 transition-colors"
                 title="Negrita"
-                onClick={() => editor.chain().focus().toggleBold().run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleBold().run();
+                }}
               >
                 <LucideBold className="w-4 h-4" />
               </button>
               <button
                 className="p-2 rounded hover:bg-gray-200 transition-colors"
                 title="Cursiva"
-                onClick={() => editor.chain().focus().toggleItalic().run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleItalic().run();
+                }}
               >
                 <LucideItalic className="w-4 h-4" />
               </button>
               <button
                 className="p-2 rounded hover:bg-gray-200 transition-colors"
                 title="Subrayado"
-                onClick={() => editor.chain().focus().toggleUnderline().run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleUnderline().run();
+                }}
               >
                 <LucideUnderline className="w-4 h-4" />
               </button>
               <button
                 className="p-2 rounded hover:bg-gray-200 transition-colors"
                 title="Tachado"
-                onClick={() => editor.chain().focus().toggleStrike().run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleStrike().run();
+                }}
               >
                 <Strikethrough className="w-4 h-4" />
               </button>
               <button
                 className="p-2 rounded hover:bg-gray-200 transition-colors"
                 title="Resaltado"
-                onClick={() => editor.chain().focus().toggleHighlight().run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleHighlight().run();
+                }}
               >
                 <Highlighter className="w-4 h-4" />
               </button>
@@ -218,21 +317,30 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
             <div className="flex gap-1 border-r border-gray-300 pr-2">
               <button
                 title="Título 1"
-                onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleHeading({ level: 1 }).run();
+                }}
                 className={`{ p-2 rounded hover:bg-gray-200 transition-colors} ${editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}`}
               >
                 <Heading1 className="w-4 h-4" />
               </button>
               <button
                 title="Título 2"
-                onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleHeading({ level: 2 }).run();
+                }}
                 className={`{ p-2 rounded hover:bg-gray-200 transition-colors} ${editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}`}
               >
                 <Heading2 className="w-4 h-4" />
               </button>
               <button
                 title="Título 3"
-                onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleHeading({ level: 3 }).run();
+                }}
                 className={`{ p-2 rounded hover:bg-gray-200 transition-colors} ${editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}`}
               >
                 <Heading3 className="w-4 h-4" />
@@ -242,7 +350,10 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
             {/* Lists */}
             <div className="flex gap-1 border-r border-gray-300 pr-2">
               <button
-                onClick={() => editor.chain().focus().toggleBulletList().run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleBulletList().run();
+                }}
                 className={`p-2 rounded hover:bg-gray-200 transition-colors ${editor.isActive('bulletList') ? 'is-active' : ''}`}
                 title="Lista con viñetas"
               >
@@ -251,12 +362,18 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
               <button
                 className="p-2 rounded hover:bg-gray-200 transition-colors"
                 title="Lista numerada"
-                onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleOrderedList().run();
+                }}
               >
                 <ListOrdered className="w-4 h-4" />
               </button>
               <button
-                onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().toggleBlockquote().run();
+                }}
                 className={`p-2 rounded hover:bg-gray-200 transition-colors ${editor.isActive('blockquote') ? 'is-active' : ''}`}
                 title="Cita"
               >
@@ -269,28 +386,40 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
               <button
                 className="p-2 rounded hover:bg-gray-200 transition-colors"
                 title="Alinear izquierda"
-                onClick={() => editor.chain().focus().setTextAlign('left').run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().setTextAlign('left').run();
+                }}
               >
                 <AlignLeft className="w-4 h-4" />
               </button>
               <button
                 className="p-2 rounded hover:bg-gray-200 transition-colors"
                 title="Centrar"
-                onClick={() => editor.chain().focus().setTextAlign('center').run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().setTextAlign('center').run();
+                }}
               >
                 <AlignCenter className="w-4 h-4" />
               </button>
               <button
                 className="p-2 rounded hover:bg-gray-200 transition-colors"
                 title="Alinear derecha"
-                onClick={() => editor.chain().focus().setTextAlign('right').run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().setTextAlign('right').run();
+                }}
               >
                 <AlignRight className="w-4 h-4" />
               </button>
               <button
                 className="p-2 rounded hover:bg-gray-200 transition-colors"
                 title="Justificar"
-                onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  editor.chain().focus().setTextAlign('justify').run();
+                }}
               >
                 <AlignJustify className="w-4 h-4" />
               </button>
@@ -298,7 +427,7 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
           </div>
 
           {/* Editor Area */}
-          <div className="bg-white rounded-b-lg p-4 min-h-[400px]">
+          <div className="bg-white rounded-b-lg px-2 min-h-[400px]">
             <EditorContent editor={editor} />
           </div>
         </div>
@@ -314,7 +443,6 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
               'Guardar'
             )}
           </button>
-
         </div>
       </form>
     </div>

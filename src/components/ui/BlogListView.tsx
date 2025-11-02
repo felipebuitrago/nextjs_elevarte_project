@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { ArrowLeft, Calendar, Tag as TagIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { formatDate } from '@/lib/utils'
 
 interface Tag {
   id: string
@@ -26,20 +27,23 @@ interface BlogListViewProps {
   tags: Tag[]
   currentPage: number
   totalPages: number
+  currentSort: string
 }
 
-export default function BlogListView({ 
-  posts, 
-  tags, 
-  currentPage, 
+export default function BlogListView({
+  posts,
+  tags,
+  currentPage,
   totalPages,
+  currentSort
 }: BlogListViewProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
   const cardsRef = useRef<(HTMLDivElement | null)[]>([])
-  
+
   const selectedTag = searchParams.get('tag') || 'todas'
+  const selectedSort = searchParams.get('sort') || 'desc'
 
   const handleTagChange = (tagSlug: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -52,27 +56,30 @@ export default function BlogListView({
     router.push(`/blog?${params.toString()}`)
   }
 
+  const handleSortChange = (sortValue: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (sortValue === 'desc') {
+      params.delete('sort')
+    } else {
+      params.set('sort', sortValue)
+    }
+    params.delete('page') // Reset to page 1 when sorting
+    router.push(`/blog?${params.toString()}`)
+  }
+
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('page', page.toString())
     router.push(`/blog?${params.toString()}`)
   }
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('es', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    }).format(new Date(date))
-  }
-
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-12">
           {/* Back Button */}
-          <Link 
+          <Link
             href="/"
             className="flex items-center gap-2 text-amber-900 hover:text-amber-700 transition-colors font-Zain text-lg"
           >
@@ -80,24 +87,44 @@ export default function BlogListView({
             Volver a página principal
           </Link>
 
-          {/* Tag Filter */}
-          <div className="flex items-center gap-3">
-            <label htmlFor="tag-filter" className="text-amber-900 font-Zain text-lg">
-              Filtrar por:
-            </label>
-            <select
-              id="tag-filter"
-              value={selectedTag}
-              onChange={(e) => handleTagChange(e.target.value)}
-              className="px-4 py-2 rounded-full bg-white/50 border border-amber-900/20 text-amber-900 font-Zain backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-amber-900/30 transition-all cursor-pointer"
-            >
-              <option value="todas">Todas</option>
-              {tags.map((tag) => (
-                <option key={tag.id} value={tag.slug}>
-                  {tag.name}
-                </option>
-              ))}
-            </select>
+
+          {/* Filters Container */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Tag Filter */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <label htmlFor="tag-filter" className="text-amber-900 font-Zain text-sm sm:text-base whitespace-nowrap">
+                Categoría:
+              </label>
+              <select
+                id="tag-filter"
+                value={selectedTag}
+                onChange={(e) => handleTagChange(e.target.value)}
+                className="w-full sm:w-auto px-4 py-2 rounded-full bg-white/50 border border-amber-900/20 text-amber-900 font-Zain backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-amber-900/30 transition-all cursor-pointer text-sm sm:text-base"
+              >
+                <option value="todas">Todas</option>
+                {tags.map((tag) => (
+                  <option key={tag.id} value={tag.slug}>
+                    {tag.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Sort Filter */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <label htmlFor="sort-filter" className="text-amber-900 font-Zain text-sm sm:text-base whitespace-nowrap">
+                Fecha:
+              </label>
+              <select
+                id="sort-filter"
+                value={selectedSort}
+                onChange={(e) => handleSortChange(e.target.value)}
+                className="w-full sm:w-auto px-4 py-2 rounded-full bg-white/50 border border-amber-900/20 text-amber-900 font-Zain backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-amber-900/30 transition-all cursor-pointer text-sm sm:text-base"
+              >
+                <option value="desc">Más recientes</option>
+                <option value="asc">Más antiguos</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -148,8 +175,8 @@ export default function BlogListView({
                     {post.coverImage && (
                       <div className="lg:w-1/3 flex-shrink-0">
                         <div className="relative h-48 lg:h-[300px] max-h-[200px] rounded-2xl overflow-hidden">
-                          <img 
-                            src={post.coverImage} 
+                          <img
+                            src={post.coverImage}
                             alt={post.title}
                             className="w-full h-full max-h-[200px] object-cover group-hover:scale-110 transition-transform duration-500"
                           />
@@ -163,14 +190,14 @@ export default function BlogListView({
                         <h2 className="text-4xl md:text-5xl font-Dongle text-amber-900 mb-2">
                           {post.title}
                         </h2>
-                        
+
                         {/* Meta Info */}
                         <div className="flex flex-wrap items-center gap-4 text-sm text-amber-700/70 font-DMSans mb-3">
                           <div className="flex items-center gap-1.5">
                             <Calendar className="w-4 h-4" />
                             <span>{formatDate(post.publishedAt!)}</span>
                           </div>
-                          
+
                           {post.tag && (
                             <div className="flex items-center gap-1.5">
                               <span className="px-3 py-1 rounded-full bg-amber-900/10 text-amber-900 border border-amber-900/20">
@@ -213,11 +240,10 @@ export default function BlogListView({
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`w-10 h-10 rounded-full font-Zain transition-all ${
-                    currentPage === page
-                      ? 'bg-amber-900 text-white'
-                      : 'bg-white/50 border border-amber-900/20 text-amber-900 hover:bg-white/70'
-                  }`}
+                  className={`w-10 h-10 rounded-full font-Zain transition-all ${currentPage === page
+                    ? 'bg-amber-900 text-white'
+                    : 'bg-white/50 border border-amber-900/20 text-amber-900 hover:bg-white/70'
+                    }`}
                 >
                   {page}
                 </button>

@@ -17,18 +17,18 @@ export default function Testimonials({ testimonials }: { testimonials: any[] }) 
           </h2>
           <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
             <Marquee className="[--duration:20s]">
-              {testimonials.map((review) => (
-                <ReviewCard key={review.username} {...review} />
+              {testimonials.map((review, index) => (
+                <ReviewCard key={`review-line1-${index}`} {...review} />
               ))}
             </Marquee>
             <Marquee reverse className="[--duration:20s]">
-              {testimonials.map((review) => (
-                <ReviewCard key={review.username} {...review} />
+              {testimonials.map((review, index) => (
+                <ReviewCard key={`review-line2-${index}`} {...review} />
               ))}
             </Marquee>
             <Marquee className="[--duration:20s]">
-              {testimonials.map((review) => (
-                <ReviewCard key={review.username} {...review} />
+              {testimonials.map((review, index) => (
+                <ReviewCard key={`review-line3-${index}`} {...review} />
               ))}
             </Marquee>
           </div>
