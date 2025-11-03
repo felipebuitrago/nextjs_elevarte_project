@@ -1,13 +1,22 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Sparkles, Home, Users, Heart, MapPin, Globe } from 'lucide-react';
-import ModalServicesCourses from './ui/ModalServicesCourses';
+import { Home, Users, Heart, MapPin, Globe, HandHelping } from 'lucide-react';
+import ModalServices from './ui/ModalServices';
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
 interface Precio {
   tipo: string;
   valor: string;
+}
+
+interface OpcionesReiki {
+  nombre: string;
+  duracion: string;
+  retroalimentacion?: string;
+  inversion: { tipo: string; precio: string }[];
+  idealPara: string;
+  nota?: string;
 }
 
 export interface Servicio {
@@ -18,7 +27,7 @@ export interface Servicio {
   shortDesc: string;
   fullDescription: string;
   queTrabajas?: string[];
-  beneficios: string[];
+  beneficios?: string[];
   duracion: string;
   precios?: string | Precio[];
   modalidad: string[];
@@ -29,67 +38,120 @@ export interface Servicio {
   requisitos?: string;
   sesiones?: string;
   formato?: boolean;
+  coverImage: string;
+  opciones?: OpcionesReiki[]; // ✅ Nueva propiedad
+  notaGeneral?: string; // ✅ Nueva propiedad
 }
 
 const servicios = [
   {
     id: 'terapia-reiki',
-    icon: Sparkles,
+    icon: HandHelping,
     title: 'Terapia Reiki',
-    subtitle: 'Sanación Energética Holística',
+    coverImage: "https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/reiki.jpg",
+    subtitle: 'Canalización de la Energía Universal para sanar tu cuerpo, mente y espíritu.',
     shortDesc: 'Canaliza energía universal para restaurar tu equilibrio',
     fullDescription: 'El Reiki Usui es una técnica de sanación energética que canaliza la energía universal hacia tu cuerpo, mente y espíritu para restaurar el equilibrio natural. Se aplica a través de la imposición de manos (sin contacto físico necesario) y puede realizarse tanto de manera presencial como a distancia.',
     queTrabajas: [
-      'Liberar estrés, ansiedad, tristeza, inseguridad',
-      'Disolver bloqueos energéticos',
-      'Reducir dolores físicos y tensión muscular',
-      'Mejorar la calidad del descanso y del sueño',
-      'Sanar heridas emocionales y espirituales',
-      'Conectar con la divinidad y tu esencia interior',
-      'Complementar tratamientos médicos tradicionales'
+      'Liberar estrés, ansiedad, tristeza, inseguridad y otras emociones agobiantes.',
+      'Disolver bloqueos energéticos que afectan tu bienestar.',
+      'Reducir dolores físicos y tensión muscular.',
+      'Mejorar la calidad del descanso y del sueño.',
+      'Sanar heridas emocionales y espirituales.',
+      'Conectar con la divinidad y tu esencia interior.',
+      'Complementar y potenciar tratamientos médicos tradicionales.'
     ],
-    beneficios: ['Sanación profunda', 'Calma y equilibrio', 'Complementa tratamientos'],
+    beneficios: ['Sanación profunda en cuerpo, mente y espíritu.', 'Sensación de calma, claridad y equilibrio interior.', 'Energía renovada y vitalidad.', 'Mayor conexión espiritual y confianza en la vida.'],
     duracion: '45min - 1h',
     precio: '$80 Presencial a domicilio (Calgary), $70 A distancia (online mundial)',
     modalidad: ['Presencial', 'Online'],
-    notaEtica: 'El Reiki es un complemento holístico que favorece la sanación y el bienestar. No sustituye servicios médicos ni psicológicos, pero puede potenciar y acompañar tratamientos tradicionales.',
+    opciones: [
+      {
+        nombre: 'Sesión Esencial',
+        duracion: '30 minutos',
+        retroalimentacion: 'Aproximadamente 15 minutos de retroalimentación, preguntas y respuestas',
+        inversion: [
+          { tipo: 'Presencial', precio: '$60' },
+          { tipo: 'A distancia', precio: '$50' }
+        ],
+        idealPara: 'Ideal para quienes desean una primera experiencia con Reiki o mantener de forma frecuente y rutinaria su energía equilibrada de manera regular. Una sesión corta, pero profundamente revitalizante, especialmente si se realiza con cierta regularidad.',
+      },
+      {
+        nombre: 'Sesión de Equilibrio',
+        duracion: '1 hora',
+        retroalimentacion: 'Aproximadamente 20 a 30 minutos de retroalimentación, preguntas y respuestas',
+        inversion: [
+          { tipo: 'Presencial', precio: '$80' },
+          { tipo: 'A distancia', precio: '$70' }
+        ],
+        idealPara: 'Recomendada para quienes buscan liberar tensiones, equilibrar sus centros energéticos y conectar con mayor claridad interior. Incluye un espacio más amplio para integrar lo trabajado y recibir orientación personalizada.',
+      },
+      {
+        nombre: 'Sesión Profunda',
+        duracion: '1.5 horas',
+        retroalimentacion: 'Aproximadamente 20 a 30 minutos de retroalimentación, preguntas y respuestas',
+        inversion: [
+          { tipo: 'Presencial', precio: '$100' }
+        ],
+        idealPara: 'Las sesiones presenciales de larga duración permiten un intercambio energético más profundo y personalizado. Esta opción es ideal para procesos de liberación, limpieza energética y expansión espiritual más intensa.',
+        nota: 'Las sesiones de 1.5 y 2 horas están disponibles únicamente de forma presencial, ya que requieren un nivel de trabajo energético más profundo y un acompañamiento cercano que se facilita mejor en persona.',
+      },
+      {
+        nombre: 'Sesión Integral Premium',
+        duracion: '2 horas',
+        retroalimentacion: 'Aproximadamente 20 a 30 minutos de retroalimentación, preguntas y respuestas',
+        inversion: [
+          { tipo: 'Presencial', precio: '$130' }
+        ],
+        idealPara: 'Diseñada para quienes desean una experiencia completa de sanación y guía espiritual. Permite trabajar profundamente a nivel físico, emocional, mental y espiritual, favoreciendo la apertura y reconexión con el ser interior.',
+        nota: 'Las sesiones de 1.5 y 2 horas están disponibles únicamente de forma presencial, ya que requieren un nivel de trabajo energético más profundo y un acompañamiento cercano que se facilita mejor en persona.',
+      }
+    ],
+    notaGeneral: 'El tiempo de retroalimentación puede variar ligeramente según la energía que se haya movido durante el proceso y las preguntas o sensaciones que el cliente desee compartir. Este espacio es fundamental para integrar conscientemente lo vivido y comprender los mensajes o bloqueos energéticos identificados.',
+    notaEtica: 'El Reiki es un complemento holístico que favorece la sanación y el bienestar. No sustituye servicios médicos ni psicológicos, pero puede potenciar y acompañar tratamientos tradicionales al ser acompañamiento holístico.',
   },
   {
     id: 'limpieza-espacios',
     icon: Home,
-    title: 'Limpieza Energética',
-    subtitle: 'Purificación de Espacios',
+    coverImage: "https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/limpieza_energetica.jpg",
+    title: 'Limpieza Energética de Espacios',
+    subtitle: 'Renueva y purifica la energía de tu hogar o negocio y crea armonía.',
     shortDesc: 'Armoniza y libera energías en tus espacios',
-    fullDescription: 'Los lugares donde vivimos y trabajamos absorben la energía de lo que allí ocurre: emociones, tensiones, discusiones, rutinas cargadas… Con el tiempo, estas energías pueden quedarse estancadas y generar pesadez, incomodidad o sensación de desorden en el ambiente. La Limpieza Energética con Reiki ayuda a purificar, sanar y armonizar hogares, oficinas y empresas.',
+    fullDescription: 'Los lugares donde vivimos y trabajamos absorben la energía de lo que allí ocurre: emociones, tensiones, discusiones, rutinas cargadas… Con el tiempo, estas energías pueden quedarse estancadas y generar pesadez, incomodidad o sensación de desorden en el ambiente. La Limpieza Energética con Reiki ayuda a purificar, sanar y armonizar hogares, oficinas y empresas, liberando bloqueos para que la energía vuelva a fluir con ligereza.',
     queTrabajas: [
-      'Disolver estancamientos energéticos',
-      'Recuperar la armonía y ligereza del ambiente',
-      'Favorecer la concentración, la calma y el descanso',
-      'Atraer nuevas oportunidades y bienestar',
-      'Liberar bloqueos para que la energía fluya'
+      'Mejorar el flujo energético: Una limpieza energética favorece un flujo de energía más armónico y positivo dentro del espacio del hogar.',
+      'Mejorar el estado de ánimo: Al liberar la energía negativa, se crea un ambiente más liviano y armonioso, que influye positivamente en el bienestar emocional de quienes habitan el lugar.',
+      'Reducir el estrés: Eliminar el desorden y realizar una limpieza energética genera un entorno más tranquilo y relajante, ayudando a disminuir el estrés y promover la calma interior.',
+      'Mejorar descanso: Un hogar energéticamente equilibrado contribuye a mejorar la calidad del sueño, favoreciendo el descanso y la renovación física y mental.',
+      'Crear intenciones positivas: Al establecer intenciones conscientes durante la limpieza, se potencia la manifestación de esas energías dentro del hogar.',
+      "Liberar la energía estancada: Las técnicas de limpieza energética, como el sahumerio o la limpieza con hierbas, ayudan a disipar la energía densa o estancada, renovando el ambiente y llenándolo de vitalidad.",
+      "Generar mayor conexión espiritual: Los rituales de limpieza del hogar suelen incluir elementos espirituales que fortalecen la conexión entre los habitantes y su espacio, elevando su frecuencia energética.",
+      "Fomentar armonía: Al equilibrar la energía del hogar, se promueve un mayor sentido de paz, armonía y bienestar entre todos los miembros de la familia.",
+      "Aumenta la productividad: Un espacio organizado y energéticamente limpio favorece la concentración, la creatividad y la eficiencia, generando un entorno ideal para trabajar o crear.",
+      "Incrementar sensación de renovación: Una limpieza energética del hogar brinda una sensación de frescura, renovación y nuevos comienzos, ayudando a liberar cualquier influencia o energía negativa asociada al pasado."
     ],
-    beneficios: ['Ambiente armonioso', 'Mayor concentración', 'Atrae bienestar'],
     duracion: 'Variable',
     precio: '$100 Desde Hogares, $120 Desde Oficinas, $400 Desde Empresas (2 sesiones)',
     modalidad: ['Calgary, Canada'],
-    notaEtica: 'Servicio únicamente disponible en Calgary (Airdrie, Chestermere, Okotoks y Cochrane también disponibles por un valor adicional).',
+    notaEtica: 'Este servicio está únicamente disponible en Calgary (Airdrie, Chestermere, Okotoks y Cochrane también disponibles por un valor adicional).',
   },
   {
     id: 'coaching-personal',
     icon: Users,
+    coverImage: "https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/coaching.jpg",
     title: 'Coaching Personal & PNL',
-    subtitle: 'Desarrollo y Transformación',
+    subtitle: 'Transforma tus hábitos, pensamientos y emociones con guía consciente, y dale un cambio radical a tu vida.',
     shortDesc: 'Alcanza tus metas y transforma tu vida',
-    fullDescription: 'El Coaching en Desarrollo Personal es un proceso de acompañamiento semanal o quincenal diseñado para ayudarte a alcanzar tus metas, superar bloqueos y generar cambios reales en tu vida. A través de herramientas prácticas como la Programación Neurolingüística (PNL), mindfulness, respiración consciente, trabajamos en tus objetivos de manera clara y funcional.',
+    fullDescription: 'El Coaching en Desarrollo Personal es un proceso de acompañamiento semanal o quincenal diseñado para ayudarte a alcanzar tus metas, superar bloqueos y generar cambios reales en tu vida. A través de herramientas prácticas como la Programación Neurolingüística (PNL), mindfulness, respiración consciente, entre otros, trabajamos en tus objetivos de manera clara y funcional.',
     queTrabajas: [
-      'Toma de decisiones y cambios de vida',
-      'Procesos de duelo y aceptación',
-      'Regulación emocional y manejo del estrés',
-      'Construir hábitos saludables y funcionales',
-      'Fortalecer la autoestima y la confianza personal',
-      'Transformar creencias limitantes en nuevas posibilidades'
+      'Toma de decisiones y cambios de vida.',
+      'Procesos de duelo y aceptación.',
+      'Regulación emocional y manejo del estrés.',
+      'Construir hábitos saludables y funcionales.',
+      'Fortalecer la autoestima y la confianza personal.',
+      'Transformar creencias limitantes en nuevas posibilidades.'
     ],
-    beneficios: ['Claridad en metas', 'Regulación emocional', 'Hábitos saludables'],
+    beneficios: ['Mayor claridad en tus metas.', 'Orden y estructura en tu día a día.', 'Regulación emocional y calma interior.', 'Crecimiento personal sostenido.', 'Autoconocimiento y comprensión de tus emociones.'],
     duracion: '90min',
     precio: '$80 Por sesión',
     modalidad: ['Presencial', 'Online'],
@@ -98,23 +160,22 @@ const servicios = [
   {
     id: 'spiritual-coaching',
     icon: Heart,
+    coverImage: "https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/coaching(1).jpg",
     title: 'Spiritual Coaching',
-    subtitle: 'Conexión con tu Esencia',
+    subtitle: 'Reconecta con tu esencia, tu intuición y tu propósito más profundo.',
     shortDesc: 'Descubre tu propósito espiritual',
     fullDescription: 'El Coaching Espiritual es un acompañamiento semanal o quincenal para quienes desean conectar con su esencia más profunda y darle un nuevo sentido a su vida. No se trata de religión, sino de un proceso de autodescubrimiento y conexión interior, donde encuentras herramientas para vivir con más armonía, propósito y plenitud.',
     queTrabajas: [
-      'Reconocer tu propósito y tu camino espiritual',
-      'Explorar y desarrollar tus dones y fortalezas internas',
-      'Aprender a escuchar tu intuición y las señales de la vida',
-      'Meditaciones y visualizaciones para conectar con tu luz interior',
-      'Conexión con seres de luz',
-      'Comprender la espiritualidad como camino de autoconocimiento'
+      'Reconocer tu propósito y tu camino espiritual.',
+      'Explorar y desarrollar tus dones y fortalezas internas.',
+      'Aprender a escuchar tu intuición y las señales de la vida.',
+      'Meditaciones y visualizaciones para conectar con tu luz interior y con seres de luz.',
+      'Comprender la espiritualidad como un camino de autoconocimiento y expansión personal.'
     ],
-    beneficios: ['Claridad de propósito', 'Conexión interior', 'Confianza y paz'],
+    beneficios: ['Mayor claridad en tu vida y decisiones.', 'Sentir mayor conexión contigo y con el todo.', 'Experiencias de calma, sanación y apertura interior.', 'Transformar miedos en confianza y dudas en propósito.'],
     duracion: '90min',
-    precio: '$80 Por sesión' ,
+    precio: '$80 Por sesión',
     modalidad: ['Presencial', 'Online'],
-    notaEtica: 'Este es un proceso espiritual no religioso enfocado en el autodescubrimiento y la conexión interior.',
   }
 ];
 
@@ -173,7 +234,7 @@ export default function ServiceSection() {
         className="relative min-h-screen py-20 px-4 md:px-8"
       >
 
-        <div className="relative z-10 max-w-7xl mx-auto">
+        <div className="relative z-10 max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
             <h2 className="text-6xl lg:text-8xl font-Dongle text-[#8B4513] mb-4">
@@ -192,81 +253,87 @@ export default function ServiceSection() {
                   onMouseEnter={() => setHoveredCard(servicio.id)}
                   onMouseLeave={() => setHoveredCard(null)}
                   onClick={() => setSelectedServicio(servicio)}
-                  className="group relative"
+                  className="group relative cursor-pointer"
                 >
                   {/* Card */}
                   <div className={`
-                  relative h-full backdrop-blur-xl bg-white/40 rounded-3xl p-8
-                  border border-white/50 shadow-xl
-                  transition-all duration-500 ease-out
-                  ${hoveredCard === servicio.id ? 'shadow-2xl scale-[1.02]' : ''}
-                `}>
-                    {/* Gradient border effect on hover */}
-                    <div className={`
-                    absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100
-                    transition-opacity duration-500
-                    bg-gradient-to-br from-[#8B4513]/10 to-[#A0522D]/10
-                    -z-10 blur-xl
-                  `} />
+                    relative h-full backdrop-blur-xl bg-white/40 rounded-3xl overflow-hidden
+                    border border-white/50 shadow-xl
+                    transition-all duration-500 ease-out
+                    ${hoveredCard === servicio.id ? 'shadow-2xl scale-[1.02]' : ''}
+                  `}>
+                    {/* Gradient glow on hover */}
+                    <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#8B4513]/10 to-[#A0522D]/10 -z-10 blur-xl" />
 
                     {/* Top decoration line */}
-                    <div className={`
-                    absolute top-0 left-8 right-8 h-[3px] rounded-full
-                    bg-gradient-to-r from-[#8B4513] to-[#A0522D]
-                    transform origin-left scale-x-0 group-hover:scale-x-100
-                    transition-transform duration-700 ease-out
-                  `} />
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#8B4513] to-[#A0522D] transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700 ease-out z-10" />
+
+                    {/* Image Container */}
+                    <div className="relative h-56 overflow-hidden bg-gradient-to-br from-amber-900/20 to-amber-800/20">
+                      {/* Imagen */}
+                      <img
+                        src={servicio.coverImage || "/photo.jpg"}
+                        alt={servicio.title}
+                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                      />
+
+                      {/* Overlay gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                      {/* Icon Badge flotante */}
+                      <div className="absolute top-6 left-6 p-3 rounded-2xl bg-white/90 backdrop-blur-sm border border-white shadow-lg transform -translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                        <servicio.icon className="w-6 h-6 text-amber-900" />
+                      </div>
+
+                    </div>
 
                     {/* Content */}
-                    <div className="space-y-4 mb-6">
-                      <div>
-                        <h3 className="text-4xl md:text-5xl font-Dongle text-amber-900 mb-1">
-                          {servicio.title}
-                        </h3>
-                        <p className="text-sm text-amber-700/70 font-DMSans">
-                          {servicio.subtitle}
-                        </p>
+                    <div className="p-8">
+                      <div className="space-y-4 mb-6">
+                        <div>
+                          <h3 className="text-4xl md:text-5xl font-Dongle text-amber-900 mb-1 leading-none">
+                            {servicio.title}
+                          </h3>
+                          <p className="text-sm text-amber-700/70 font-DMSans leading-tight">
+                            {servicio.subtitle}
+                          </p>
+                        </div>
+
                       </div>
 
-                      <p className="text-amber-800/80 leading-relaxed font-DMSans">
-                        {servicio.shortDesc}
-                      </p>
-
-                      {/* Benefits */}
-                      <div className="flex flex-wrap gap-2">
-                        {servicio.beneficios.map((benefit, i) => (
-                          <span
+                      {/* Modalidad tags */}
+                      <div className="flex flex-wrap gap-2 mb-6">
+                        {servicio.modalidad.map((mod, i) => (
+                          <div
                             key={i}
-                            className="text-md px-3 py-1.5 rounded-full bg-white/50 text-amber-800 border border-white/50 font-Zain"
+                            className="inline-flex items-center gap-1.5 text-sm font-Zain px-3 py-1.5 rounded-full bg-amber-900/10 text-amber-900 border border-amber-900/20"
                           >
-                            ✓ {benefit}
-                          </span>
+                            {mod.includes('Calgary') ? (
+                              <MapPin className="w-3 h-3" />
+                            ) : mod.includes('Presencial') ? (
+                              <Users className="w-3 h-3" />
+                            ) : (
+                              <Globe className="w-3 h-3" />
+                            )}
+                            {mod}
+                          </div>
                         ))}
                       </div>
-                    </div>
 
-                    {/* Modalidad tags */}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {servicio.modalidad.map((mod, i) => (
-                        <div
-                          key={i}
-                          className="inline-flex items-center gap-1.5 text-sm font-Zain px-3 py-1.5 rounded-full bg-amber-900/10 text-amber-900 border border-amber-900/20"
-                        >
-                          {mod.includes('Calgary') ? (
-                            <MapPin className="w-3 h-3" />
-                          ) : mod.includes('Presencial') ? (
-                            <Users className="w-3 h-3" />
-                          ) : (
-                            <Globe className="w-3 h-3" />
-                          )}
-                          {mod}
+                      {/* Click hint con línea decorativa */}
+                      <div className="pt-4 border-t border-amber-900/10">
+                        <div className="flex items-center justify-between text-sm text-[#8B4513]/60 font-Zain group-hover:text-[#8B4513] transition-colors">
+                          <span>Click para ver más información</span>
+                          <svg
+                            className="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
                         </div>
-                      ))}
-                    </div>
-
-                    {/* Click hint */}
-                    <div className="text-center py-3 text-sm text-[#8B4513]/60 font-Zain group-hover:text-[#8B4513] transition-colors">
-                      Click para ver más información →
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -288,7 +355,7 @@ export default function ServiceSection() {
 
       {/* Modal */}
       {selectedServicio && (
-        <ModalServicesCourses selectedServicio={selectedServicio} setSelectedServicio={setSelectedServicio} />
+        <ModalServices selectedServicio={selectedServicio} setSelectedServicio={setSelectedServicio} />
       )}
 
       <style>{`

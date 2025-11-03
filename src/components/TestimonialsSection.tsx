@@ -9,29 +9,30 @@ export default function Testimonials({ testimonials }: { testimonials: any[] }) 
       id='testimonials-section'
       className="relative min-h-screen pt-20 px-4 md:px-8"
     >
-      <div className="relative z-10 max-w-7xl mx-auto">
+      <div className="relative z-10 max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-6xl lg:text-8xl font-Dongle text-[#8B4513] mb-16">
             Testimonios
           </h2>
           <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-            <Marquee className="[--duration:20s]">
+            <Marquee pauseOnHover className="[--duration:20s]">
               {testimonials.map((review, index) => (
                 <ReviewCard key={`review-line1-${index}`} {...review} />
               ))}
             </Marquee>
-            <Marquee reverse className="[--duration:20s]">
+            <Marquee pauseOnHover reverse className="[--duration:20s]">
               {testimonials.map((review, index) => (
                 <ReviewCard key={`review-line2-${index}`} {...review} />
               ))}
             </Marquee>
-            <Marquee className="[--duration:20s]">
+            <Marquee pauseOnHover className="[--duration:20s]" >
               {testimonials.map((review, index) => (
                 <ReviewCard key={`review-line3-${index}`} {...review} />
               ))}
             </Marquee>
           </div>
+
         </div>
       </div>
     </section>

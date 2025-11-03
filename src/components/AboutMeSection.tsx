@@ -225,19 +225,19 @@ export default function AboutMeSection() {
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
 
+{/* Close button */}
+        <button
+          onClick={() => setOpenModal(false)}
+          className="absolute top-6 right-6 p-2 rounded-full bg-white z-10"
+        >
+          <X className="w-6 h-6 text-amber-900" />
+        </button>
+
           {/* Modal Content */}
           <div
             className="relative bg-gradient-to-br from-[#d4c4b0] via-[#c9b59a] to-[#b8a589] rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border-2 border-white/50 animate-slideUp"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Fixed Close button - stays on top during scroll */}
-            <button
-              onClick={() => setOpenModal(false)}
-              className="relative right-0 p-3 z-[9999] rounded-full bg-white/90 hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg border border-white/50 cursor-pointer"
-            >
-              <X className="w-5 h-5 text-amber-900" />
-            </button>
-
             {/* Scrollable content */}
             <div className="overflow-y-auto max-h-[90vh] custom-scrollbar">
               {/* Header with image and gradient */}

@@ -4,8 +4,8 @@ import { Podcast, BookOpen, Calendar, FileText, Youtube } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
 
-interface PodcastBlogSectionProps{
-  posts : {
+interface PodcastBlogSectionProps {
+  posts: {
     id: string,
     title: string,
     slug: string,
@@ -18,7 +18,7 @@ interface PodcastBlogSectionProps{
   }[]
 }
 
-export default function PodcastBlogSection({posts} : PodcastBlogSectionProps) {
+export default function PodcastBlogSection({ posts }: PodcastBlogSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const podcastsRef = useRef<(HTMLDivElement | null)[]>([]);
   const blogsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -212,6 +212,12 @@ export default function PodcastBlogSection({posts} : PodcastBlogSectionProps) {
                   </div>
                 </Link>
               ))}
+              <div className='w-full flex justify-center'>
+                <Link href="/blog" className="px-8 py-4 bg-white/40 backdrop-blur-sm text-amber-900 rounded-full font-Zain font-bold text-xl border-2 border-white/60 hover:bg-white/60 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer">
+                  Ir al Blog
+                </Link>
+
+              </div>
             </div>
 
           </div>
