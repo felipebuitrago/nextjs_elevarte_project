@@ -102,7 +102,7 @@ export default function AboutMeSection() {
                 {/* Main image container */}
                 <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white/50 shadow-2xl bg-gradient-to-br from-[#D2B48C] to-[#DEB887]">
                   <img
-                    src="/photo.jpg"
+                    src="https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/photo.jpg"
                     alt="Camila Rodríguez - Reiki Master"
                     className="w-full h-full object-cover"
                   />
@@ -256,7 +256,7 @@ export default function AboutMeSection() {
                   {/* Image side */}
                   <div className="relative h-64 md:h-80 rounded-2xl overflow-hidden shadow-xl border-2 border-white/40">
                     <img
-                      src="/img.jpg"
+                      src="https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/img.JPG"
                       alt="Camila - Elevarte"
                       className="w-full h-full object-cover"
                     />

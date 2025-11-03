@@ -24,8 +24,6 @@ export default async function HomePage() {
     take: 3
   })
 
-  console.log(posts)
-
   return (
     <div className='bg-gradient-to-br from-[#d4c4b0] via-[#c9b59a] to-[#b8a589]'>
       <DockNavigation />
