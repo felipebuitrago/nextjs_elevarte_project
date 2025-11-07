@@ -33,6 +33,10 @@ const config: runtime.GetPrismaClientConfig = {
         "fromEnvVar": null,
         "value": "darwin-arm64",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "rhel-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -55,8 +59,8 @@ const config: runtime.GetPrismaClientConfig = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/app/generated/prisma\"\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL\")\n  directUrl = env(\"DIRECT_URL\")\n  schemas   = [\"public\"]\n}\n\nmodel Profile {\n  id        String  @id @db.Uuid\n  fullName  String? @map(\"full_name\")\n  email     String? @unique\n  avatarUrl String? @map(\"avatar_url\")\n\n  @@map(\"profiles\")\n  @@schema(\"public\")\n}\n\nmodel Tag {\n  id        String   @id @default(cuid())\n  name      String   @unique\n  slug      String   @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  active    Boolean  @default(true)\n  posts     Post[]\n\n  @@schema(\"public\")\n}\n\nmodel Post {\n  id          String    @id @default(cuid())\n  title       String\n  slug        String    @unique\n  content     String\n  coverImage  String?\n  excerpt     String?\n  published   Boolean   @default(false)\n  publishedAt DateTime?\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n  tagId       String?\n  tag         Tag?      @relation(fields: [tagId], references: [id])\n\n  @@index([tagId])\n  @@index([published])\n  @@index([publishedAt])\n  @@schema(\"public\")\n}\n\nmodel Testimonial {\n  id        String   @id @default(cuid())\n  name      String\n  body      String\n  rating    Int      @default(5)\n  published Boolean  @default(false)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@index([published])\n  @@index([createdAt])\n  @@schema(\"public\")\n}\n",
-  "inlineSchemaHash": "1ba4b512f10fa675411484929eb15ec5f02fdcbd7ffea1483245e0a893269e16",
+  "inlineSchema": "generator client {\n  provider      = \"prisma-client\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n  output        = \"../src/app/generated/prisma\"\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL\")\n  directUrl = env(\"DIRECT_URL\")\n  schemas   = [\"public\"]\n}\n\nmodel Profile {\n  id        String  @id @db.Uuid\n  fullName  String? @map(\"full_name\")\n  email     String? @unique\n  avatarUrl String? @map(\"avatar_url\")\n\n  @@map(\"profiles\")\n  @@schema(\"public\")\n}\n\nmodel Tag {\n  id        String   @id @default(cuid())\n  name      String   @unique\n  slug      String   @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  active    Boolean  @default(true)\n  posts     Post[]\n\n  @@schema(\"public\")\n}\n\nmodel Post {\n  id          String    @id @default(cuid())\n  title       String\n  slug        String    @unique\n  content     String\n  coverImage  String?\n  excerpt     String?\n  published   Boolean   @default(false)\n  publishedAt DateTime?\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n  tagId       String?\n  tag         Tag?      @relation(fields: [tagId], references: [id])\n\n  @@index([tagId])\n  @@index([published])\n  @@index([publishedAt])\n  @@schema(\"public\")\n}\n\nmodel Testimonial {\n  id        String   @id @default(cuid())\n  name      String\n  body      String\n  rating    Int      @default(5)\n  published Boolean  @default(false)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@index([published])\n  @@index([createdAt])\n  @@schema(\"public\")\n}\n",
+  "inlineSchemaHash": "fef0ad5a95d98b72486a626bb212e35346ddc60c1301b52779d95968834290df",
   "copyEngine": true,
   "runtimeDataModel": {
     "models": {},
