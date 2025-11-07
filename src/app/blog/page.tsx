@@ -9,32 +9,45 @@ export default async function BlogPage(props: {
   }>;
 }) {
 
-  const searchParams = await props.searchParams;
-
-  const page = parseInt(searchParams?.page || '1')
-  const tag = searchParams?.tag || ''
-  const sort = searchParams?.sort || 'desc'
+  let error = null
+  let posts: Post[] = []
+  let tags: Tag[] = []
+  let page = 1
+  let totalPosts = 0
   const postsPerPage = 5
+  let sort = 'desc'
 
-  const posts = await db.post.findMany({
-    where: {
-      published: true,
-      ...(tag && { tag: { slug: tag } })
-    },
-    include: { tag: true },
-    orderBy: { publishedAt: sort === 'asc' ? 'asc' : 'desc' },
-    skip: (page - 1) * postsPerPage,
-    take: postsPerPage
-  })
+  try {
+    const searchParams = await props.searchParams;
 
-  const totalPosts = await db.post.count({
-    where: { 
-      published: true,
-      ...(tag && { tag: { slug: tag } })
-    }
-  })
+    page = parseInt(searchParams?.page || '1')
+    const tag = searchParams?.tag || ''
+    sort = searchParams?.sort || 'desc'
 
-  const tags = await db.tag.findMany()
+    posts = await db.post.findMany({
+      where: {
+        published: true,
+        ...(tag && { tag: { slug: tag } })
+      },
+      include: { tag: true },
+      orderBy: { publishedAt: sort === 'asc' ? 'asc' : 'desc' },
+      skip: (page - 1) * postsPerPage,
+      take: postsPerPage
+    })
+
+    totalPosts = await db.post.count({
+      where: {
+        published: true,
+        ...(tag && { tag: { slug: tag } })
+      }
+    })
+
+    tags = await db.tag.findMany()
+  } catch (e) {
+    console.error(e)
+    error = "failed to fetch data"
+  }
+
 
   return (
     <BlogListView
@@ -45,4 +58,20 @@ export default async function BlogPage(props: {
       currentSort={sort}
     />
   )
+}
+
+interface Tag {
+  id: string
+  name: string
+  slug: string
+}
+
+interface Post {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  coverImage: string | null
+  publishedAt: Date | null
+  tag: Tag | null
 }
