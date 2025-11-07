@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import db from '@/lib/db'
 import { TagActiveSwitch } from '@/components/ui/TagActiveSwitch'
+import { Tag } from '@/app/blog/page'
 
 export default async function TagsPage() {
   const supabase = await createClient()
@@ -14,15 +15,21 @@ export default async function TagsPage() {
   }
 
   // Obtener tags de la base de datos
-  const tags = await db.tag.findMany({
-    select: { 
-      id: true, 
-      name: true, 
-      slug: true, 
-      active: true 
-    }, 
-    orderBy: { name: 'asc' }
-  })
+  let tags: Tag[] = [];
+  
+  try {
+    tags = await db.tag.findMany({
+      select: { 
+        id: true, 
+        name: true, 
+        slug: true, 
+        active: true 
+      }, 
+      orderBy: { name: 'asc' }
+    })
+  } catch (error) {
+    console.error(error);
+  }
 
   return (
     <div className='p-8'>

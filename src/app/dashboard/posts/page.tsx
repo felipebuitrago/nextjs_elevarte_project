@@ -15,11 +15,16 @@ export default async function PostsPage() {
   }
 
   // Obtener posts de la base de datos
-  const posts = await db.post.findMany({
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
+  let posts: Post[] = [];
+  try {
+    posts = await db.post.findMany({
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    })
+  } catch (error) {
+    console.error(error);
+  }
 
   return (
     <div className='p-8'>
@@ -105,4 +110,12 @@ export default async function PostsPage() {
       </div>
     </div>
   )
+}
+
+interface Post {
+  id: string;
+  title: string;
+  coverImage: string | null;
+  published: boolean;
+  publishedAt: Date | null;
 }

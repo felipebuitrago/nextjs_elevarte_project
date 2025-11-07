@@ -1,3 +1,4 @@
+import { Tag } from '@/app/blog/page';
 import EditPostPage from '@/components/EditPostPage';
 import db from '@/lib/db'
 import Link from 'next/link';
@@ -12,20 +13,28 @@ export default async function EditPost(props: {
 
   const id = searchParams?.id || '';
 
-  const tags = await db.tag.findMany();
-  const post = await db.post.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      coverImage: true,
-      tagId: true,
-      content: true,
-      excerpt: true,
-      published: true,
-    },
-  });
+  let tags: Tag[] = [];
+  let post: Post | null = null;
+
+  try {
+    tags = await db.tag.findMany();
+    post = await db.post.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        coverImage: true,
+        tagId: true,
+        content: true,
+        excerpt: true,
+        published: true,
+        publishedAt: true
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
 
   if (!post) {
     return <div className="p-8">Post no encontrado.</div>;
@@ -33,7 +42,7 @@ export default async function EditPost(props: {
 
   return (
     <>
-      
+
       <div className='p-8'>
         {/* Header */}
         <div className="mb-8 flex items-center justify-between max-w-6xl mx-auto">
@@ -62,4 +71,16 @@ export default async function EditPost(props: {
       </div>
     </>
   );
+}
+
+interface Post {
+  id: string,
+  title: string,
+  slug: string,
+  coverImage: string | null,
+  tagId: string | null,
+  content: string,
+  excerpt: string | null,
+  published: boolean,
+  publishedAt: Date | null,
 }

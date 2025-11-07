@@ -2,6 +2,7 @@ import db from "@/lib/db";
 import { ArrowLeft, Calendar, Tag as TagIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Post } from "../page";
 
 export default async function PostPage(props: {
   params?: Promise<{
@@ -11,16 +12,23 @@ export default async function PostPage(props: {
   const params = await props.params
   const slug = params?.slug || ''
 
+  let post: Post | null = null
+
   // Buscar el post por slug
-  const post = await db.post.findUnique({
-    where: {
-      slug: slug,
-      published: true
-    },
-    include: {
-      tag: true
-    }
-  })
+  try {
+    post = await db.post.findUnique({
+      where: {
+        slug: slug,
+        published: true
+      },
+      include: {
+        tag: true
+      }
+    })
+    
+  } catch (error) {
+    console.error(error)
+  }
 
   // Si no existe, mostrar 404
   if (!post) {

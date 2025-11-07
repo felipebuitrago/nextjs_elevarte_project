@@ -4,7 +4,12 @@ import Link from "next/link";
 
 export default async function HomePage() {
 
-  const tags = await db.tag.findMany();
+  let tags : { id: string; name: string; }[] = [];
+  try {
+    tags = await db.tag.findMany();
+  } catch (error) {
+    console.error(error);
+  }
 
   return (
     <div className='p-8'>

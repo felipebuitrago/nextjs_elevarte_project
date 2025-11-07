@@ -1,5 +1,6 @@
 import EditTestimonialPage from '@/components/EditTestimonialPage';
 import db from '@/lib/db'
+import { Testimonial } from '../page';
 
 export default async function EditTestimonial(props: {
   searchParams?: Promise<{
@@ -11,15 +12,22 @@ export default async function EditTestimonial(props: {
 
   const id = searchParams?.id || '';
 
-  const testimonial = await db.testimonial.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      name: true,
-      body: true,
-      rating: true,
-    },
-  });
+  let testimonial: Testimonial | null = null;
+  
+  try {
+    testimonial = await db.testimonial.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        body: true,
+        rating: true,
+        published: true
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
 
   if (!testimonial) {
     return <div className="p-8">Testimonio no encontrado.</div>;

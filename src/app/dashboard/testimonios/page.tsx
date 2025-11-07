@@ -9,28 +9,35 @@ import { Edit, Edit2 } from 'lucide-react'
 export default async function TestimonialsPage() {
   const supabase = await createClient()
   const { data: userData, error: userError } = await supabase.auth.getUser()
-  
+
   if (userError || !userData?.user) {
     redirect('/')
   }
 
   // Obtener testimonios de la base de datos
-  const testimonials = await db.testimonial.findMany({
-    select: { 
-      id: true, 
-      name: true, 
-      body: true, 
-      published: true,
-      rating: true
-    }, 
-    orderBy: { updatedAt: 'desc' }
-  })
+  let testimonials: Testimonial[] = [];
+
+  try {
+    testimonials = await db.testimonial.findMany({
+      select: {
+        id: true,
+        name: true,
+        body: true,
+        published: true,
+        rating: true
+      },
+      orderBy: { updatedAt: 'desc' }
+    })
+    
+  } catch (error) {
+    console.error(error)
+  }
 
   return (
     <div className='p-8'>
       {/* Header */}
       <div className="mb-8 flex items-center justify-between max-w-6xl mx-auto">
-        <Link 
+        <Link
           href="/dashboard"
           className="flex items-center gap-2 text-amber-900 hover:text-amber-700 transition-colors duration-300"
         >
@@ -81,9 +88,9 @@ export default async function TestimonialsPage() {
                         >
                           <Edit className="w-5 h-5 text-amber-900 hover:text-amber-700" />
                         </Link>
-                        <TestimonialActiveSwitch 
-                          testimonialId={testimonial.id} 
-                          initialActive={testimonial.published} 
+                        <TestimonialActiveSwitch
+                          testimonialId={testimonial.id}
+                          initialActive={testimonial.published}
                         />
                       </td>
                     </tr>
@@ -102,4 +109,12 @@ export default async function TestimonialsPage() {
       </div>
     </div>
   )
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  body: string;
+  published: boolean;
+  rating: number;
 }

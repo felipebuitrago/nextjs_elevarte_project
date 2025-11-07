@@ -60,13 +60,14 @@ export default async function BlogPage(props: {
   )
 }
 
-interface Tag {
+export interface Tag {
   id: string
   name: string
   slug: string
+  active: boolean
 }
 
-interface Post {
+export interface Post {
   id: string
   title: string
   slug: string
@@ -74,4 +75,5 @@ interface Post {
   coverImage: string | null
   publishedAt: Date | null
   tag: Tag | null
+  content: string
 }

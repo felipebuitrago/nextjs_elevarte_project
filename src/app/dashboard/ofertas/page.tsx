@@ -12,10 +12,10 @@ export default async function OfertasPage() {
   }
 
   // Obtener ofertas de la base de datos
-  const { data: ofertas, error } = await supabase
-    .from('ofertas')
-    .select('*')
-    .order('created_at', { ascending: false })
+  //const { data: ofertas, error } = await supabase
+  //  .from('ofertas')
+  //  .select('*')
+  //  .order('created_at', { ascending: false })
 
   return (
     <div className='p-8'>
@@ -42,7 +42,7 @@ export default async function OfertasPage() {
         <p className="text-lg text-amber-700/60 font-DMSans">Gestiona tus ofertas y promociones</p>
       </div>
 
-      {/* Table */}
+      {/* Table 
       <div className="max-w-6xl mx-auto">
         <div className="backdrop-blur-xl bg-white/40 rounded-3xl border border-white/50 shadow-xl overflow-hidden">
           <div className="overflow-x-auto">
@@ -97,7 +97,7 @@ export default async function OfertasPage() {
             </table>
           </div>
         </div>
-      </div>
+      </div>*/}
     </div>
   )
 }
