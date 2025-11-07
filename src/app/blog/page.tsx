@@ -16,9 +16,9 @@ export default async function BlogPage(props: {
   let totalPosts = 0
   const postsPerPage = 5
   let sort = 'desc'
+  const searchParams = await props.searchParams;
 
   try {
-    const searchParams = await props.searchParams;
 
     page = parseInt(searchParams?.page || '1')
     const tag = searchParams?.tag || ''
