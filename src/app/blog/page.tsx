@@ -1,5 +1,7 @@
+// app/blog/page.tsx
 import BlogListView from '@/components/ui/BlogListView'
-import db from '@/lib/db'
+import { createClient } from '@/utils/supabase/server'
+import { PostWithTag, Tag } from '@/types/'
 
 export default async function BlogPage(props: {
   searchParams?: Promise<{
@@ -8,46 +10,59 @@ export default async function BlogPage(props: {
     sort?: string;
   }>;
 }) {
-
-  let error = null
-  let posts: Post[] = []
-  let tags: Tag[] = []
-  let page = 1
-  let totalPosts = 0
-  const postsPerPage = 5
-  let sort = 'desc'
+  const supabase = await createClient();
   const searchParams = await props.searchParams;
+  
+  const page = parseInt(searchParams?.page || '1');
+  const tagSlug = searchParams?.tag || '';
+  const sort = searchParams?.sort || 'desc';
+  const postsPerPage = 5;
+  
+  let posts: PostWithTag[] = [];
+  let tags: Tag[] = [];
+  let totalPosts = 0;
+  let error = null;
 
   try {
+    // Query base para posts
+    let postsQuery = supabase
+      .from('Post')
+      .select('*, tag:Tag(*)', { count: 'exact' })
+      .eq('published', true)
+      .order('publishedAt', { ascending: sort === 'asc' })
+      .range((page - 1) * postsPerPage, page * postsPerPage - 1);
 
-    page = parseInt(searchParams?.page || '1')
-    const tag = searchParams?.tag || ''
-    sort = searchParams?.sort || 'desc'
+    // Filtro por tag si existe
+    if (tagSlug) {
+      postsQuery = postsQuery.eq('tag.slug', tagSlug);
+    }
 
-    posts = await db.post.findMany({
-      where: {
-        published: true,
-        ...(tag && { tag: { slug: tag } })
-      },
-      include: { tag: true },
-      orderBy: { publishedAt: sort === 'asc' ? 'asc' : 'desc' },
-      skip: (page - 1) * postsPerPage,
-      take: postsPerPage
-    })
+    const { data: postsData, error: postsError, count } = await postsQuery;
 
-    totalPosts = await db.post.count({
-      where: {
-        published: true,
-        ...(tag && { tag: { slug: tag } })
-      }
-    })
+    if (postsError) throw postsError;
 
-    tags = await db.tag.findMany()
+    posts = postsData ?? [];
+    totalPosts = count ?? 0;
+
+    // Obtener todos los tags
+    const { data: tagsData, error: tagsError } = await supabase
+      .from('Tag')
+      .select('*')
+      .eq('active', true)
+      .order('name');
+
+    if (tagsError) throw tagsError;
+
+    tags = tagsData ?? [];
+
   } catch (e) {
-    console.error(e)
-    error = "failed to fetch data"
+    console.error('Error fetching blog data:', e);
+    error = "Failed to fetch data";
   }
 
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <BlogListView
@@ -57,23 +72,5 @@ export default async function BlogPage(props: {
       totalPages={Math.ceil(totalPosts / postsPerPage)}
       currentSort={sort}
     />
-  )
-}
-
-export interface Tag {
-  id: string
-  name: string
-  slug: string
-  active: boolean
-}
-
-export interface Post {
-  id: string
-  title: string
-  slug: string
-  excerpt: string | null
-  coverImage: string | null
-  publishedAt: Date | null
-  tag: Tag | null
-  content: string
+  );
 }

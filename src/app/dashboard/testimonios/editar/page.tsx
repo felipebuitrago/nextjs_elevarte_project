@@ -1,6 +1,6 @@
 import EditTestimonialPage from '@/components/EditTestimonialPage';
-import db from '@/lib/db'
-import { Testimonial } from '../page';
+import { Testimonial } from '@/types';
+import { createClient } from '@/utils/supabase/server';
 
 export default async function EditTestimonial(props: {
   searchParams?: Promise<{
@@ -9,22 +9,20 @@ export default async function EditTestimonial(props: {
 }) {
 
   const searchParams = await props.searchParams;
+  const supabase = await createClient()
 
   const id = searchParams?.id || '';
 
   let testimonial: Testimonial | null = null;
   
   try {
-    testimonial = await db.testimonial.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        name: true,
-        body: true,
-        rating: true,
-        published: true
-      },
-    });
+    testimonial = await supabase
+    .from('Testimonial')
+    .select('*')
+    .eq('id', id)
+    .single()
+    .then(({ data }) => data);
+      
   } catch (error) {
     console.error(error);
   }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Clock, Globe, Sparkles, Users } from 'lucide-react';
 import ModalCourses from './ui/ModalCourses';
 

@@ -5,25 +5,10 @@ import { ArrowLeft, Calendar, Tag as TagIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { formatDate } from '@/lib/utils'
-
-interface Tag {
-  id: string
-  name: string
-  slug: string
-}
-
-interface Post {
-  id: string
-  title: string
-  slug: string
-  excerpt: string | null
-  coverImage: string | null
-  publishedAt: Date | null
-  tag: Tag | null
-}
+import { PostWithTag, Tag } from '@/types'
 
 interface BlogListViewProps {
-  posts: Post[]
+  posts: PostWithTag[]
   tags: Tag[]
   currentPage: number
   totalPages: number
@@ -195,7 +180,7 @@ export default function BlogListView({
                         <div className="flex flex-wrap items-center gap-4 text-sm text-amber-700/70 font-DMSans mb-3">
                           <div className="flex items-center gap-1.5">
                             <Calendar className="w-4 h-4" />
-                            <span>{formatDate(post.publishedAt!)}</span>
+                            <span>{post.publishedAt}</span>
                           </div>
 
                           {post.tag && (

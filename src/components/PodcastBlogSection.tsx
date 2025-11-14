@@ -3,19 +3,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Podcast, BookOpen, Calendar, FileText, Youtube } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
+import { PostWithTag } from '@/types';
 
 interface PodcastBlogSectionProps {
-  posts: {
-    id: string,
-    title: string,
-    slug: string,
-    coverImage: string | null,
-    tagId: string | null,
-    content: string,
-    excerpt: string | null,
-    publishedAt: Date | null,
-    tag: { id: string; name: string; slug: string; createdAt: Date; updatedAt: Date; active: boolean; } | null
-  }[]
+  posts: PostWithTag[]
 }
 
 export default function PodcastBlogSection({ posts }: PodcastBlogSectionProps) {
@@ -202,7 +193,7 @@ export default function PodcastBlogSection({ posts }: PodcastBlogSectionProps) {
                           <div className="flex items-center gap-4 text-xs text-[#8B4513]/60">
                             <div className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
-                              <span>{formatDate(post.publishedAt!)}</span>
+                              <span>{post.publishedAt}</span>
                             </div>
                           </div>
                         </div>

@@ -1,10 +1,9 @@
-// app/dashboard/posts/page.tsx
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import db from '@/lib/db'
 import { Edit } from 'lucide-react'
 import { PostPublishedSwitch } from '@/components/ui/PostPublishedSwitch'
+import { Post } from '@/types'
 
 export default async function PostsPage() {
   const supabase = await createClient()
@@ -17,11 +16,14 @@ export default async function PostsPage() {
   // Obtener posts de la base de datos
   let posts: Post[] = [];
   try {
-    posts = await db.post.findMany({
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    })
+    const { data, error: postsError } = await supabase
+    .from("Post")
+    .select("*")
+    .order('updatedAt', { ascending: false });
+    
+    posts = data ?? [];
+    
+    if (postsError) throw postsError;
   } catch (error) {
     console.error(error);
   }
@@ -110,12 +112,4 @@ export default async function PostsPage() {
       </div>
     </div>
   )
-}
-
-interface Post {
-  id: string;
-  title: string;
-  coverImage: string | null;
-  published: boolean;
-  publishedAt: Date | null;
 }

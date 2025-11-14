@@ -1,32 +1,29 @@
-// app/dashboard/tags/page.tsx
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import db from '@/lib/db'
 import { TagActiveSwitch } from '@/components/ui/TagActiveSwitch'
-import { Tag } from '@/app/blog/page'
+import { Tag } from '@/types'
 
 export default async function TagsPage() {
   const supabase = await createClient()
   const { data: userData, error: userError } = await supabase.auth.getUser()
-  
+
   if (userError || !userData?.user) {
     redirect('/')
   }
 
   // Obtener tags de la base de datos
   let tags: Tag[] = [];
-  
+
   try {
-    tags = await db.tag.findMany({
-      select: { 
-        id: true, 
-        name: true, 
-        slug: true, 
-        active: true 
-      }, 
-      orderBy: { name: 'asc' }
-    })
+    const { data, error } = await supabase
+      .from('Tag')
+      .select('id, name, slug, active')
+      .order('name', { ascending: true });
+
+    tags = data ?? [];
+
+    if (error) throw error;
   } catch (error) {
     console.error(error);
   }
@@ -35,7 +32,7 @@ export default async function TagsPage() {
     <div className='p-8'>
       {/* Header */}
       <div className="mb-8 flex items-center justify-between max-w-6xl mx-auto">
-        <Link 
+        <Link
           href="/dashboard"
           className="flex items-center gap-2 text-amber-900 hover:text-amber-700 transition-colors duration-300"
         >
@@ -77,9 +74,9 @@ export default async function TagsPage() {
                       <td className="p-6 text-amber-900 font-DMSans">{tag.name}</td>
                       <td className="p-6 text-amber-700/60 font-DMSans">{tag.slug}</td>
                       <td className="p-6 text-right">
-                        <TagActiveSwitch 
-                          tagId={tag.id} 
-                          initialActive={tag.active} 
+                        <TagActiveSwitch
+                          tagId={tag.id}
+                          initialActive={tag.active}
                         />
                       </td>
                     </tr>

@@ -4,14 +4,10 @@ import Link from 'next/link'
 import { useActionState, useState } from 'react'
 import { updateTestimonial, type TestimonialFormState } from '@/lib/actions/testimonialActions'
 import { Star } from 'lucide-react'
+import { Testimonial } from '@/types'
 
 type EditTestimonialPageProps = {
-  testimonial: {
-    id: string
-    name: string
-    body: string
-    rating: number
-  }
+  testimonial: Testimonial
 }
 
 export default function EditTestimonialPage({ testimonial }: EditTestimonialPageProps) {
@@ -73,7 +69,6 @@ export default function EditTestimonialPage({ testimonial }: EditTestimonialPage
               id="id"
               name="id"
               defaultValue={testimonial.id}
-              value={testimonial.id}
               className="hidden"
             />
 
@@ -86,7 +81,6 @@ export default function EditTestimonialPage({ testimonial }: EditTestimonialPage
                 type="text"
                 id="name"
                 name="name"
-                defaultValue={testimonial.name}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans"
@@ -107,7 +101,6 @@ export default function EditTestimonialPage({ testimonial }: EditTestimonialPage
                 id="body"
                 name="body"
                 rows={5}
-                defaultValue={testimonial.body}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans resize-none"
@@ -124,7 +117,7 @@ export default function EditTestimonialPage({ testimonial }: EditTestimonialPage
               <label className="block text-amber-900 font-DMSans font-semibold mb-2">
                 Calificación
               </label>
-              <input type="hidden" name="rating" value={rating} />
+              <input type="hidden" name="rating" value={rating!} />
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -138,8 +131,8 @@ export default function EditTestimonialPage({ testimonial }: EditTestimonialPage
                   >
                     <Star
                       className="w-8 h-8"
-                      fill={star <= (hoverRating || rating) ? "#d97706" : "#9ca3af"}
-                      stroke={star <= (hoverRating || rating) ? "#d97706" : "#9ca3af"}
+                      fill={star <= (hoverRating || rating!) ? "#d97706" : "#9ca3af"}
+                      stroke={star <= (hoverRating || rating!) ? "#d97706" : "#9ca3af"}
                     />
                   </button>
                 ))}
@@ -188,8 +181,8 @@ export default function EditTestimonialPage({ testimonial }: EditTestimonialPage
                     <Star
                       key={i}
                       className="w-4 h-4"
-                      fill={i < rating ? "#d97706" : "#9ca3af"}
-                      stroke={i < rating ? "#d97706" : "#9ca3af"}
+                      fill={i < rating! ? "#d97706" : "#9ca3af"}
+                      stroke={i < rating! ? "#d97706" : "#9ca3af"}
                     />
                   ))}
                 </div>

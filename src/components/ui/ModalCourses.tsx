@@ -1,5 +1,4 @@
 "use client";
-import React from "react"
 import type { Curso } from "../CoursesSection"
 import { AlertCircle, CheckCircle, Globe, MapPin, X } from "lucide-react"
 

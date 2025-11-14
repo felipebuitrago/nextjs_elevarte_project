@@ -6,23 +6,35 @@ import PodcastBlogSection from "@/components/PodcastBlogSection";
 import ServiceSection from "@/components/ServicesSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import DockNavigation from "@/components/ui/DockNavigation";
-import db from "@/lib/db";
+import { PostWithTag } from "@/types";
+import { createClient } from "@/utils/supabase/server";
 
 export default async function HomePage() {
 
-  const testimonials = await db.testimonial.findMany();
-  const posts = await db.post.findMany({
-    where: {
-      published: true
-    },
-    include: {
-      tag: true
-    },
-    orderBy: {
-      publishedAt: 'desc'
-    },
-    take: 3
-  })
+  const supabase = await createClient();
+    
+  // ✅ Testimonials
+  const { data: testimonials, error: testimonialsError } = await supabase
+    .from('Testimonial') // Nombre de tu tabla (verifica en Supabase)
+    .select('*')
+    .eq('published', true);
+  
+  // ✅ Posts con relación de tag
+  const { data: posts, error: postsError } = await supabase
+    .from('Post')
+    .select(`
+      *,
+      tag:Tag(*)
+    `)
+    .eq('published', true)
+    .order('publishedAt', { ascending: false })
+    .limit(3);
+  
+  if (postsError) console.error('Error fetching posts:', postsError);
+  if (testimonialsError) console.error('Error fetching testimonials:', testimonialsError);
+  
+  const safeTestimonials: any[] = testimonials ?? [];
+  const safePosts: PostWithTag[] = posts ?? [];
 
   return (
     <div className='bg-gradient-to-br from-[#d4c4b0] via-[#c9b59a] to-[#b8a589]'>
@@ -32,8 +44,8 @@ export default async function HomePage() {
       <AboutMeSection />
       <ServiceSection />
       <CoursesSection />
-      <TestimonialsSection testimonials={testimonials} />
-      <PodcastBlogSection posts={posts}/>
+      <TestimonialsSection testimonials={safeTestimonials} />
+      <PodcastBlogSection posts={safePosts}/>
       <FooterSection />
     </div>
   )

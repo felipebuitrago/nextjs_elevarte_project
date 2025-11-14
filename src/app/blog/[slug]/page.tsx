@@ -1,47 +1,61 @@
-import db from "@/lib/db";
-import { ArrowLeft, Calendar, Tag as TagIcon } from "lucide-react";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Post } from "../page";
+import { createClient } from '@/utils/supabase/server';
+import { notFound } from 'next/navigation';
+import { PostWithTag } from '@/types';
+import Link from 'next/link';
+import { ArrowLeft, Calendar, TagIcon } from 'lucide-react';
 
 export default async function PostPage(props: {
   params?: Promise<{
     slug?: string;
   }>;
 }) {
-  const params = await props.params
-  const slug = params?.slug || ''
+  const params = await props.params;
+  const slug = params?.slug || '';
+  
+  let post: PostWithTag | null = null;
 
-  let post: Post | null = null
-
-  // Buscar el post por slug
   try {
-    post = await db.post.findUnique({
-      where: {
-        slug: slug,
-        published: true
-      },
-      include: {
-        tag: true
+    const supabase = await createClient();
+    
+    // ✅ Buscar el post por slug
+    const { data, error } = await supabase
+      .from('Post')
+      .select('*, tag:Tag(*)')
+      .eq('slug', slug)
+      .eq('published', true)
+      .single(); // .single() lanza error si no encuentra nada
+
+    if (error) {
+      // Si es error "not found", retornar null
+      if (error.code === 'PGRST116') {
+        post = null;
+      } else {
+        throw error;
       }
-    })
+    } else {
+      post = data;
+    }
     
   } catch (error) {
-    console.error(error)
+    console.error('Error fetching post:', error);
+    post = null;
   }
 
-  // Si no existe, mostrar 404
+  // ✅ Si no existe, mostrar 404
   if (!post) {
-    notFound()
+    notFound();
   }
 
-  const formatDate = (date: Date) => {
+  // ✅ Función para formatear fecha (ahora recibe string)
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Fecha no disponible';
+    
     return new Intl.DateTimeFormat('es', { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
-    }).format(new Date(date))
-  }
+    }).format(new Date(dateString));
+  };
 
   return (
     <div className="min-h-screen py-12 px-4">

@@ -1,7 +1,7 @@
-import { Tag } from '@/app/blog/page';
+import { Post, Tag } from '@/types';
 import EditPostPage from '@/components/EditPostPage';
-import db from '@/lib/db'
 import Link from 'next/link';
+import { createClient } from '@/utils/supabase/server';
 
 export default async function EditPost(props: {
   searchParams?: Promise<{
@@ -10,28 +10,30 @@ export default async function EditPost(props: {
 }) {
 
   const searchParams = await props.searchParams;
-
+  const supabase = await createClient()
   const id = searchParams?.id || '';
 
   let tags: Tag[] = [];
   let post: Post | null = null;
 
   try {
-    tags = await db.tag.findMany();
-    post = await db.post.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        coverImage: true,
-        tagId: true,
-        content: true,
-        excerpt: true,
-        published: true,
-        publishedAt: true
-      },
-    });
+    const { data: dataTags, error } = await supabase
+      .from('Tag')
+      .select('*')
+      .eq('active', true)
+      .order('name', { ascending: true });
+    tags = dataTags ?? [];
+    
+    const { data: dataPost, error: postError } = await supabase
+      .from('Post')
+      .select('*')
+      .eq('id', id)
+      .single();
+    post = dataPost;
+    
+    if (error) throw error;
+    if (postError) throw postError;
+    
   } catch (error) {
     console.error(error);
   }
@@ -71,16 +73,4 @@ export default async function EditPost(props: {
       </div>
     </>
   );
-}
-
-interface Post {
-  id: string,
-  title: string,
-  slug: string,
-  coverImage: string | null,
-  tagId: string | null,
-  content: string,
-  excerpt: string | null,
-  published: boolean,
-  publishedAt: Date | null,
 }

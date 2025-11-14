@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { toggleTestimonialPublished } from '@/lib/actions/testimonialActions'
 import { togglePostPublished } from '@/lib/actions/postActions'
 
 interface PostPublishedSwitchProps {

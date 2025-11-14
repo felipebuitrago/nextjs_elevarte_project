@@ -1,10 +1,9 @@
-// app/dashboard/testimonials/page.tsx
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import db from '@/lib/db'
 import { TestimonialActiveSwitch } from '@/components/ui/TestimonialActiveSwitch'
 import { Edit, Edit2 } from 'lucide-react'
+import { Testimonial } from '@/types'
 
 export default async function TestimonialsPage() {
   const supabase = await createClient()
@@ -18,19 +17,17 @@ export default async function TestimonialsPage() {
   let testimonials: Testimonial[] = [];
 
   try {
-    testimonials = await db.testimonial.findMany({
-      select: {
-        id: true,
-        name: true,
-        body: true,
-        published: true,
-        rating: true
-      },
-      orderBy: { updatedAt: 'desc' }
-    })
+    const { data, error } = await supabase
+      .from('Testimonial')
+      .select('id, name, body, published, rating')
+      .order('updatedAt', { ascending: false });
+    
+    if (error) throw error;
+    
+    testimonials = data ?? [];
     
   } catch (error) {
-    console.error(error)
+    console.error('Error fetching testimonials:', error);
   }
 
   return (
@@ -109,12 +106,4 @@ export default async function TestimonialsPage() {
       </div>
     </div>
   )
-}
-
-export interface Testimonial {
-  id: string;
-  name: string;
-  body: string;
-  published: boolean;
-  rating: number;
 }

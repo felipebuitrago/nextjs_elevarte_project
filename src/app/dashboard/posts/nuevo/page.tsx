@@ -1,12 +1,18 @@
 import Tiptap from "@/components/Tiptap";
-import db from "@/lib/db";
+import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 
 export default async function HomePage() {
 
+  const supabase = await createClient();
   let tags : { id: string; name: string; }[] = [];
   try {
-    tags = await db.tag.findMany();
+    const { data, error } = await supabase
+      .from('Tag')
+      .select('id, name')
+      .eq('active', true)
+      .order('name', { ascending: true });
+    tags = data ?? [];
   } catch (error) {
     console.error(error);
   }
