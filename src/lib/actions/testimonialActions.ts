@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import db from '@/lib/db'
+import { createClient } from '@/utils/supabase/server'
+import { generateId } from '../utils'
 
 // Schema de validación
 const testimonialSchema = z.object({
@@ -44,15 +45,22 @@ export async function createTestimonial(
       }
     }
 
+    const supabase = await createClient();
+
     // Crear testimonio en la base de datos
-    await db.testimonial.create({
-      data: {
+    const { error: createError } = await supabase
+      .from('Testimonial')
+      .insert({
+        id: generateId(),
         name: validatedData.data.name,
         body: validatedData.data.body,
         rating: validatedData.data.rating,
-        published: true,
-      },
-    })
+        updatedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        published: true
+      });
+
+    if (createError) throw createError;
 
     // Revalidar la ruta
     revalidatePath('/dashboard/testimonios')
@@ -92,14 +100,18 @@ export async function updateTestimonial(
       }
     }
 
-    await db.testimonial.update({
-      where: { id },
-      data: {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('Testimonial')
+      .update({
         name: validatedData.data.name,
         body: validatedData.data.body,
         rating: validatedData.data.rating,
-      },
-    })
+        updatedAt: new Date().toISOString()
+      })
+      .eq('id', id);
+
+    if (error) throw error;
 
     revalidatePath('/dashboard/testimonios')
 
@@ -118,11 +130,17 @@ export async function updateTestimonial(
 
 export async function toggleTestimonialPublished(id: string, newValue: boolean): Promise<{ success: boolean; message: string }> {
   try {
-    await db.testimonial.update({
-      where: { id },
-      data: { published: newValue }
-    })
-    
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('Testimonial')
+      .update({
+        published: newValue,
+        updatedAt: new Date().toISOString()
+      })
+      .eq('id', id);
+
+    if (error) throw error;
+
     // Revalidar la página para reflejar los cambios
     revalidatePath('/dashboard/testimonios')
 

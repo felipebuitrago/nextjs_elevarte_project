@@ -1,13 +1,18 @@
 "use server"
-
-import db from "@/lib/db";
+import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { generateId } from "../utils";
 
 export async function savePost(prevState: any, formData: FormData) {
   try {
     const htmlContent = formData.get('content') as string;
-    const post = await db.post.create({
-      data: {
+    const supabase = await createClient();
+
+    // Crear testimonio en la base de datos
+    const { error: createError } = await supabase
+      .from('Post')
+      .insert({
+        id: generateId(),
         title: formData.get('title') as string,
         slug: formData.get('slug') as string,
         excerpt: formData.get('excerpt') as string,
@@ -15,8 +20,11 @@ export async function savePost(prevState: any, formData: FormData) {
         content: htmlContent,
         published: false,
         tagId: formData.get('tagId') as string || null,
-      }
-    });
+        updatedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+      });
+
+    if (createError) throw createError;
     return { success: true };
   } catch (error: any) {
     return { success: false };
@@ -45,10 +53,21 @@ export async function updatePost(prevState: any, formData: FormData) {
     // TagId puede ser null intencionalmente
     updateData.tagId = tagId || null;
 
-    const post = await db.post.update({
-      where: { id: postId },
-      data: updateData
-    });
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('Post')
+      .update({
+        title: updateData.title,
+        slug: updateData.slug,
+        excerpt: updateData.excerpt,
+        content: updateData.content,
+        coverImage: updateData.coverImage,
+        tagId: updateData.tagId,
+        updatedAt: new Date().toISOString()
+      })
+      .eq('id', postId);
+
+    if (error) throw error;
 
     revalidatePath('/blog');
     revalidatePath(`/blog/${slug}`);
@@ -62,13 +81,17 @@ export async function updatePost(prevState: any, formData: FormData) {
 
 export async function togglePostPublished(id: string, newValue: boolean): Promise<{ success: boolean; message: string }> {
   try {
-    await db.post.update({
-      where: { id },
-      data: {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('Post')
+      .update({
         published: newValue,
-        publishedAt: newValue ? new Date() : null,
-      }
-    })
+        updatedAt: new Date().toISOString(),
+        publishedAt: newValue ? new Date().toISOString() : null,
+      })
+      .eq('id', id);
+
+    if (error) throw error;
 
     // Revalidar la página para reflejar los cambios
     revalidatePath('/dashboard/posts')

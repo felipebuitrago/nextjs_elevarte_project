@@ -1,8 +1,8 @@
 "use server"
-
-import db from '@/lib/db'
+import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { generateId } from '../utils'
 
 export type TagFormState = {
   success: boolean
@@ -59,12 +59,19 @@ export async function createTag(
   }
 
   const { name, slug } = validatedFields.data
+  const supabase = await createClient();
 
   try {
     // Verificar si existe una tag con el mismo nombre
-    const existingByName = await db.tag.findUnique({
-      where: { name }
-    })
+    const { data: existingByName, error: nameError } = await supabase
+      .from('Tag')
+      .select('id')
+      .eq('name', name)
+      .maybeSingle(); // maybeSingle() no lanza error si no encuentra nada
+
+    if (nameError && nameError.code !== 'PGRST116') {
+      throw nameError;
+    }
 
     if (existingByName) {
       return {
@@ -77,9 +84,15 @@ export async function createTag(
     }
 
     // Verificar si existe una tag con el mismo slug
-    const existingBySlug = await db.tag.findUnique({
-      where: { slug }
-    })
+    const { data: existingBySlug, error: slugError } = await supabase
+      .from('Tag')
+      .select('id')
+      .eq('slug', slug)
+      .maybeSingle();
+
+    if (slugError && slugError.code !== 'PGRST116') {
+      throw slugError;
+    }
 
     if (existingBySlug) {
       return {
@@ -90,24 +103,30 @@ export async function createTag(
         }
       }
     }
-
-    // Crear la tag
-    await db.tag.create({
-      data: {
+    // Crear la nueva tag
+    const { error: createError } = await supabase
+      .from('Tag')
+      .insert({
+        id: generateId(),
         name,
-        slug
-      }
-    })
+        slug,
+        updatedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        active: true
+      });
+
+    if (createError) throw createError;
 
     // Revalidar la página de tags
-    revalidatePath('/dashboard/tags')
+    revalidatePath('/dashboard/tags');
 
     return {
       success: true,
       message: 'Tag creada exitosamente'
     }
+
   } catch (error) {
-    console.error('Error creating tag:', error)
+    console.error('Error creating tag:', error);
     return {
       success: false,
       message: 'Error al crear la tag. Por favor intenta de nuevo.'
@@ -117,14 +136,29 @@ export async function createTag(
 
 export async function toggleTagActive(tagId: string, active: boolean) {
   try {
-    await db.tag.update({
-      where: { id: tagId },
-      data: { active }
-    })
-    
-    // Revalidar la página para reflejar los cambios
-    revalidatePath('/dashboard/tags')
-    
+    const supabase = await createClient();
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return {
+        success: false,
+        message: 'No autorizado'
+      };
+    }
+
+    const { error } = await supabase
+      .from('Tag')
+      .update({
+        active,
+        updatedAt: new Date().toISOString()
+      })
+      .eq('id', tagId);
+
+    if (error) throw error;
+
+    revalidatePath('/dashboard/tags');
+
     return { success: true }
   } catch (error) {
     console.error('Error updating tag:', error)

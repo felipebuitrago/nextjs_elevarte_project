@@ -19,7 +19,7 @@ export default async function TagsPage() {
     const { data, error } = await supabase
       .from('Tag')
       .select('id, name, slug, active')
-      .order('name', { ascending: true });
+      .order('updatedAt', { ascending: false });
 
     tags = data ?? [];
 

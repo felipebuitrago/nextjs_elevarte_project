@@ -1,20 +1,18 @@
-import GoogleSignInButton from "@/components/ui/GoogleSignInButton";
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
+import LoginForm from '@/components/ui/LoginForm';
 
-export default function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export default async function LoginPage() {
+  const supabase = await createClient();
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (user) {
+    redirect('/dashboard');
+  }
   return (
-    <div className={`flex flex-col gap-6 ${className ?? ""}`} {...props}>
-      <div className="max-w-md w-full mx-auto bg-white rounded-lg shadow p-6">
-        <header className="mb-4">
-          <h2 className="text-2xl font-semibold">Login to your account</h2>
-        </header>
-
-        <form className="flex flex-col gap-4">
-          <GoogleSignInButton/>
-        </form>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-[#d4c4b0] via-[#c9b59a] to-[#b8a589] flex items-center justify-center p-4">
+      <LoginForm />
     </div>
-  )
+  );
 }
