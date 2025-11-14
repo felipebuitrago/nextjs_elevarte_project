@@ -8,7 +8,7 @@ export default function HeroSection() {
         <img 
           src="/elevarte_logo.svg" 
           alt="Espiral Elevarte" 
-          className="spiral-animation w-[500px] h-[500px] md:w-[600px] md:h-[600px] lg:w-[700px] lg:h-[700px]"
+          className="spiral-animation w-[500px] h-[500px] md:w-[550px] md:h-[550px] "
         />
       </div>
 
