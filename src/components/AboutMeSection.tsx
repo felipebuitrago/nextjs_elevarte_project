@@ -127,7 +127,7 @@ export default function AboutMeSection() {
                   Camila Rodríguez
                 </h3>
                 <p className="text-lg text-[#A0522D] font-DMSans">
-                  Terapeuta Holística & Spiritual Coach
+                  Terapeuta Holística & Coach en desarrollo personal y espiritual
                 </p>
               </div>
 
@@ -225,13 +225,13 @@ export default function AboutMeSection() {
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
 
-{/* Close button */}
-        <button
-          onClick={() => setOpenModal(false)}
-          className="absolute top-6 right-6 p-2 rounded-full bg-white z-10"
-        >
-          <X className="w-6 h-6 text-amber-900" />
-        </button>
+          {/* Close button */}
+          <button
+            onClick={() => setOpenModal(false)}
+            className="absolute top-6 right-6 p-2 rounded-full bg-white z-10"
+          >
+            <X className="w-6 h-6 text-amber-900" />
+          </button>
 
           {/* Modal Content */}
           <div

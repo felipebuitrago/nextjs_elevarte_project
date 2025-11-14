@@ -12,7 +12,7 @@ export async function signInWithGoogle() {
         access_type: "offline",
         prompt: "consent",
       },
-      redirectTo: `https://nextjs-elevarte-project-glbazy5nl-felipe-buitragos-projects.vercel.app/auth/callback`,
+      redirectTo: `http://localhost:3000/auth/callback`,
     },
   });
 

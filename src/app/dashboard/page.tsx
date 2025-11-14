@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
+import SignOutButton from '@/components/ui/SignOut'
 import Link from 'next/link';
 
 const options = [
@@ -31,13 +32,35 @@ export default async function PrivatePage() {
 
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
+    console.log(error, data)
     redirect('/')
   }
+
+  async function signOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error signing out:', error.message);
+    } else {
+      console.log('User signed out successfully.');
+    }
+  }
+
 
   return (
     <div className='flex flex-col items-center justify-center p-4'>
       <div className="mb-12 text-center space-y-1">
         <h1 className="text-5xl font-DMSans text-amber-900">Dashboard</h1>
+      </div>
+      <div className='max-w-4xl w-full justify-start mb-5'>
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-amber-900 hover:text-amber-700 transition-colors duration-300 mt-3"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span className="text-lg font-DMSans">Volver a inicio</span>
+        </Link>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-12 max-w-6xl">
         {options.map((option, index) => {
@@ -94,6 +117,10 @@ export default async function PrivatePage() {
           );
         })}
       </div>
+      <div className='mt-3 pt-3'>
+        <SignOutButton/>
+      </div>
+
     </div>
   )
 }

@@ -50,7 +50,7 @@ const cursos: Curso[] = [
     ],
     duracion: '3.5-4 horas (1 sesión)',
     precio: '$180',
-    requisitos: 'Ninguno - Ideal para iniciar',
+    requisitos: 'Ninguno - Ideal para principiantes',
     modalidad: ['Presencial', 'Online'],
     esReiki: false,
     orden: 1,
@@ -136,7 +136,7 @@ const cursos: Curso[] = [
     fullDescription: 'Un encuentro profundo con tu rol de guía energética. Este nivel te prepara para formar a otros, transmitir el legado del Reiki y expandir tu práctica hacia espacios más conscientes, comprometidos y transformadores.',
     incluye: [
       'Aprendizaje para realizar iniciaciones (Attunements) a nuevos practicantes',
-      'Herramientas para acompañar procesos de sanación profunda',
+      'Datos legales y éticos a tener en cuenta para ejercer como terapeuta Reiki en Canadá',
       'Técnicas para programar energía Reiki en beneficio de proyectos',
       'Formación en limpiezas energéticas de espacios físicos (hogares, oficinas, etc.)',
       'Enseñanza y activación del símbolo de maestría Reiki',

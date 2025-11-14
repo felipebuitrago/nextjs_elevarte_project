@@ -63,7 +63,14 @@ export default function ModalServices({
 
                   <div className="bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-sm rounded-2xl p-5 border border-white/50">
                     <div className="text-xl text-amber-900/60 font-Dongle">Inversión</div>
-                    <div className="text-2xl font-Zain font-bold text-amber-900">{selectedServicio.precio}</div>
+                    <div className="text-2xl font-Zain font-bold text-amber-900">
+                      {selectedServicio.id === "limpieza-espacios"
+                        ? selectedServicio.precio?.split('\n').map((linea, index) => (
+                            <div key={index}>{linea}</div>
+                          ))
+                        : <span>{selectedServicio.precio}</span>
+                      }
+                    </div>
                   </div>
                 </div>
               )

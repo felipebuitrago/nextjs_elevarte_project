@@ -130,8 +130,8 @@ const servicios = [
       "Aumenta la productividad: Un espacio organizado y energéticamente limpio favorece la concentración, la creatividad y la eficiencia, generando un entorno ideal para trabajar o crear.",
       "Incrementar sensación de renovación: Una limpieza energética del hogar brinda una sensación de frescura, renovación y nuevos comienzos, ayudando a liberar cualquier influencia o energía negativa asociada al pasado."
     ],
-    duracion: 'Variable',
-    precio: '$100 Desde Hogares, $120 Desde Oficinas, $400 Desde Empresas (2 sesiones)',
+    duracion: 'Entre 1 y 1.5 horas',
+    precio: 'Hogares: desde $100\nOficinas: desde $120\nEmpresas (2 sesiones incluidas): desde $400',
     modalidad: ['Calgary, Canada'],
     notaEtica: 'Este servicio está únicamente disponible en Calgary (Airdrie, Chestermere, Okotoks y Cochrane también disponibles por un valor adicional).',
   },
@@ -152,7 +152,7 @@ const servicios = [
       'Transformar creencias limitantes en nuevas posibilidades.'
     ],
     beneficios: ['Mayor claridad en tus metas.', 'Orden y estructura en tu día a día.', 'Regulación emocional y calma interior.', 'Crecimiento personal sostenido.', 'Autoconocimiento y comprensión de tus emociones.'],
-    duracion: '90min',
+    duracion: '75min',
     precio: '$80 Por sesión',
     modalidad: ['Presencial', 'Online'],
     notaEtica: 'El Coaching no reemplaza procesos médicos, psicológicos ni psiquiátricos. Es un acompañamiento complementario de orientación y crecimiento personal.',
@@ -173,7 +173,7 @@ const servicios = [
       'Comprender la espiritualidad como un camino de autoconocimiento y expansión personal.'
     ],
     beneficios: ['Mayor claridad en tu vida y decisiones.', 'Sentir mayor conexión contigo y con el todo.', 'Experiencias de calma, sanación y apertura interior.', 'Transformar miedos en confianza y dudas en propósito.'],
-    duracion: '90min',
+    duracion: '75min',
     precio: '$80 Por sesión',
     modalidad: ['Presencial', 'Online'],
   }
