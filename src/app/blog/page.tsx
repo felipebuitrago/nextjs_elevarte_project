@@ -12,30 +12,53 @@ export default async function BlogPage(props: {
 }) {
   const supabase = await createClient();
   const searchParams = await props.searchParams;
-  
+
   const page = parseInt(searchParams?.page || '1');
   const tagSlug = searchParams?.tag || '';
   const sort = searchParams?.sort || 'desc';
   const postsPerPage = 5;
-  
+
   let posts: PostWithTag[] = [];
   let tags: Tag[] = [];
   let totalPosts = 0;
   let error = null;
 
   try {
-    // Query base para posts
+    let selectedTagId: string | null = null;
+
+    // Si hay filtro por tag, primero obtener el ID del tag
+    if (tagSlug) {
+      const { data: selectedTag, error: tagError } = await supabase
+        .from('Tag')
+        .select('id')
+        .eq('slug', tagSlug)
+        .eq('active', true)
+        .single();
+
+      if (tagError) {
+        console.error('Tag not found:', tagError);
+        // Tag no existe, retornar sin posts
+        selectedTagId = null;
+      } else {
+        selectedTagId = selectedTag.id;
+      }
+    }
+
+    // Query de posts con filtro por tagId si existe
     let postsQuery = supabase
       .from('Post')
       .select('*, tag:Tag(*)', { count: 'exact' })
-      .eq('published', true)
+      .eq('published', true);
+
+    // Filtrar por tagId si hay tag seleccionado
+    if (selectedTagId) {
+      postsQuery = postsQuery.eq('tagId', selectedTagId);
+    }
+
+    // Ordenar y paginar
+    postsQuery = postsQuery
       .order('publishedAt', { ascending: sort === 'asc' })
       .range((page - 1) * postsPerPage, page * postsPerPage - 1);
-
-    // Filtro por tag si existe
-    if (tagSlug) {
-      postsQuery = postsQuery.eq('tag.slug', tagSlug);
-    }
 
     const { data: postsData, error: postsError, count } = await postsQuery;
 
@@ -44,10 +67,17 @@ export default async function BlogPage(props: {
     posts = postsData ?? [];
     totalPosts = count ?? 0;
 
-    // Obtener todos los tags
+    // ✅ Obtener solo tags activos que tienen posts
     const { data: tagsData, error: tagsError } = await supabase
       .from('Tag')
-      .select('*')
+      .select(`
+      id,
+      name,
+      slug,
+      active,
+      createdAt,
+      updatedAt
+      `)
       .eq('active', true)
       .order('name');
 

@@ -180,7 +180,7 @@ export default function BlogListView({
                         <div className="flex flex-wrap items-center gap-4 text-sm text-amber-700/70 font-DMSans mb-3">
                           <div className="flex items-center gap-1.5">
                             <Calendar className="w-4 h-4" />
-                            <span>{post.publishedAt}</span>
+                            <span>{formatDate(post.publishedAt)}</span>
                           </div>
 
                           {post.tag && (

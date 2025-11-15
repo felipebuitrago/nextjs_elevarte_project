@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { PostWithTag } from '@/types';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, TagIcon } from 'lucide-react';
+import { formatDate } from '@/lib/utils';
+import '@/assets/post-styles.css';
 
 export default async function PostPage(props: {
   params?: Promise<{
@@ -17,7 +19,7 @@ export default async function PostPage(props: {
   try {
     const supabase = await createClient();
     
-    // ✅ Buscar el post por slug
+    // Buscar el post por slug
     const { data, error } = await supabase
       .from('Post')
       .select('*, tag:Tag(*)')
@@ -41,21 +43,10 @@ export default async function PostPage(props: {
     post = null;
   }
 
-  // ✅ Si no existe, mostrar 404
+  // Si no existe, mostrar 404
   if (!post) {
     notFound();
   }
-
-  // ✅ Función para formatear fecha (ahora recibe string)
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Fecha no disponible';
-    
-    return new Intl.DateTimeFormat('es', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    }).format(new Date(dateString));
-  };
 
   return (
     <div className="min-h-screen py-12 px-4">
@@ -111,17 +102,7 @@ export default async function PostPage(props: {
 
             {/* Content */}
             <div 
-              className="prose prose-lg prose-amber max-w-none
-                prose-headings:font-Zain prose-headings:text-amber-900
-                prose-p:text-amber-900/90 prose-p:font-Zain prose-p:leading-relaxed
-                prose-a:text-amber-700 prose-a:no-underline hover:prose-a:underline
-                prose-strong:text-amber-900 prose-strong:font-bold
-                prose-ul:text-amber-900/90 prose-ol:text-amber-900/90
-                prose-li:font-Zain prose-li:marker:text-amber-900/60
-                prose-blockquote:border-amber-900/30 prose-blockquote:text-amber-900/80
-                prose-code:text-amber-800 prose-code:bg-amber-50 prose-code:px-1 prose-code:rounded
-                prose-pre:bg-amber-900/5 prose-pre:border prose-pre:border-amber-900/20
-                prose-img:rounded-lg prose-img:shadow-md"
+              className="post-content"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           </div>

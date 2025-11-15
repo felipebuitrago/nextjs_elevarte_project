@@ -1,4 +1,3 @@
-// components/TagActiveSwitch.tsx
 'use client'
 
 import { useState, useTransition } from 'react'

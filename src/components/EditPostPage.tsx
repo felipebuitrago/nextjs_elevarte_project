@@ -20,9 +20,10 @@ import {
 } from 'lucide-react'
 import { ChangeEvent, useActionState, useEffect, useRef, useState, useTransition } from 'react'
 import { updatePost } from '@/lib/actions/postActions'
-import { convertBlobUrlToFile } from '@/lib/utils'
+import { convertBlobUrlToFile, generateSlug } from '@/lib/utils'
 import { createClient } from "@/utils/supabase/client";
 import { v4 as uuidv4 } from "uuid";
+import { useRouter } from 'next/navigation'
 
 interface TiptapProps {
   tags?: { id: string; name: string }[];
@@ -39,6 +40,7 @@ interface TiptapProps {
 }
 const EditPostPage = ({ tags, post }: TiptapProps) => {
 
+  const router = useRouter();
   const [htmlContent, setHtmlContent] = useState(post.content)
   const [coverImage, setCoverImage] = useState(post.coverImage)
 
@@ -75,7 +77,7 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
     },
   })
 
-  const [imageUrl, setImageUrl] = useState<string>(post.coverImage);
+  const [imageUrl, setImageUrl] = useState<string | null>(post.coverImage || null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -111,10 +113,35 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
   };
 
   useEffect(() => {
-  if (editor && !htmlContent) {
-    setHtmlContent(editor.getHTML())
+    if (editor && !htmlContent) {
+      setHtmlContent(editor.getHTML())
+    }
+  }, [editor]);
+
+
+  useEffect(() => {
+    if (state?.success) {
+      const timer = setTimeout(() => {
+        router.push('/dashboard/posts');
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [state?.success]);
+
+  const [title, setTitle] = useState(post.title || '')
+  const [slug, setSlug] = useState(post.slug || '');
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false)
+  useEffect(() => {
+    if (!isSlugManuallyEdited && title) {
+      setSlug(generateSlug(title))
+    }
+  }, [title, isSlugManuallyEdited])
+
+  const handleSlugChange = (value: string) => {
+    setIsSlugManuallyEdited(true)
+    setSlug(value)
   }
-}, [editor])
 
   if (!editor) {
     return null
@@ -142,7 +169,6 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
               id="coverImage"
               name="coverImage"
               className='hidden'
-              defaultValue={post.coverImage}
               value={coverImage || post.coverImage}
               onChange={(e) => setCoverImage(e.target.value)}
             />
@@ -156,13 +182,13 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
                 accept="image/*"
               />
 
-              <button
+              {/* <button
                 className="font-Zain bg-amber-900 p-2 w-40 rounded-lg text-white"
                 onClick={() => imageInputRef.current?.click()}
                 disabled={isPending}
               >
                 Seleccionar Imagen
-              </button>
+              </button> */}
 
               {isPending && <p>Subiendo imagen...</p>}
 
@@ -187,7 +213,8 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
               placeholder="Título del post"
               required
               disabled={pending}
-              defaultValue={post.title}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
             />
           </div>
@@ -200,7 +227,8 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
               placeholder="titulo-del-post"
               required
               disabled={pending}
-              defaultValue={post.slug}
+              value={slug}
+              onChange={(e) => handleSlugChange(e.target.value)}
               className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
             />
           </div>
@@ -434,6 +462,11 @@ const EditPostPage = ({ tags, post }: TiptapProps) => {
 
         {/* Botones de acción */}
         <div className="flex justify-end gap-3">
+          {state?.success && (
+            <div className="p-4 bg-green-100 border border-green-200 rounded-2xl">
+              <p className="text-green-800 font-DMSans">{state.message}</p>
+            </div>
+          )}
           <button
             type="submit"
             disabled={pending}

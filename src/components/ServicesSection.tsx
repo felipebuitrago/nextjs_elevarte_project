@@ -3,6 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Home, Users, Heart, MapPin, Globe, HandHelping } from 'lucide-react';
 import ModalServices from './ui/ModalServices';
+import ModalOfertas from './ui/ModalOfertas';
+import { Oferta } from '@/types';
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
 interface Precio {
@@ -39,8 +41,9 @@ export interface Servicio {
   sesiones?: string;
   formato?: boolean;
   coverImage: string;
-  opciones?: OpcionesReiki[]; // ✅ Nueva propiedad
-  notaGeneral?: string; // ✅ Nueva propiedad
+  opciones?: OpcionesReiki[];
+  notaGeneral?: string;
+  mensajeWhatsApp: string;
 }
 
 const servicios = [
@@ -109,6 +112,7 @@ const servicios = [
     ],
     notaGeneral: 'El tiempo de retroalimentación puede variar ligeramente según la energía que se haya movido durante el proceso y las preguntas o sensaciones que el cliente desee compartir. Este espacio es fundamental para integrar conscientemente lo vivido y comprender los mensajes o bloqueos energéticos identificados.',
     notaEtica: 'El Reiki es un complemento holístico que favorece la sanación y el bienestar. No sustituye servicios médicos ni psicológicos, pero puede potenciar y acompañar tratamientos tradicionales al ser acompañamiento holístico.',
+    mensajeWhatsApp: "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20una%20sesión%20de%20Reiki",
   },
   {
     id: 'limpieza-espacios',
@@ -134,6 +138,7 @@ const servicios = [
     precio: 'Hogares: desde $100\nOficinas: desde $120\nEmpresas (2 sesiones incluidas): desde $400',
     modalidad: ['Calgary, Canada'],
     notaEtica: 'Este servicio está únicamente disponible en Calgary (Airdrie, Chestermere, Okotoks y Cochrane también disponibles por un valor adicional).',
+    mensajeWhatsApp: "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20una%20limpieza%20energética%20de%20espacios",
   },
   {
     id: 'coaching-personal',
@@ -156,6 +161,7 @@ const servicios = [
     precio: '$80 Por sesión',
     modalidad: ['Presencial', 'Online'],
     notaEtica: 'El Coaching no reemplaza procesos médicos, psicológicos ni psiquiátricos. Es un acompañamiento complementario de orientación y crecimiento personal.',
+    mensajeWhatsApp: "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20una%20sesión%20de%20Coaching%20Personal%20y%20PNL",
   },
   {
     id: 'spiritual-coaching',
@@ -176,14 +182,16 @@ const servicios = [
     duracion: '75min',
     precio: '$80 Por sesión',
     modalidad: ['Presencial', 'Online'],
+    mensajeWhatsApp: "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20una%20sesión%20de%20Spiritual%20Coaching",
   }
 ];
 
-export default function ServiceSection() {
+export default function ServiceSection({ ofertas }: { ofertas: Oferta[] }) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [selectedServicio, setSelectedServicio] = useState<Servicio | null>(null);
+  const [openModalOfertas, setOpenModalOfertas] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -346,10 +354,27 @@ export default function ServiceSection() {
             <p className="text-amber-800/70 text-lg mb-6 font-DMSans">
               ¿No estás seguro cuál servicio es para ti?
             </p>
-            <button className="px-8 py-4 bg-white/40 backdrop-blur-sm text-amber-900 rounded-full font-Zain font-bold text-xl border-2 border-white/60 hover:bg-white/60 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+            <button
+              className="px-8 py-4 bg-white/40 backdrop-blur-sm text-amber-900 rounded-full font-Zain font-bold text-xl border-2 border-white/60 hover:bg-white/60 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              onClick={() => window.open("https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20recibir%20orientación%20personalizada", '_blank')}
+            >
               Contáctame para orientación personalizada
             </button>
           </div>
+
+          {/* Ofertas button */}
+          {
+            ofertas.length > 0 && (
+              <div className="text-center mt-12">
+                <button
+                  className="px-8 py-4 bg-white/40 backdrop-blur-sm text-amber-900 rounded-full font-Zain font-bold text-xl border-2 border-white/60 hover:bg-white/60 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  onClick={() => setOpenModalOfertas(true)}
+                >
+                  Mira nuestras ofertas especiales
+                </button>
+              </div>
+            )
+          }
         </div>
       </section>
 
@@ -357,6 +382,16 @@ export default function ServiceSection() {
       {selectedServicio && (
         <ModalServices selectedServicio={selectedServicio} setSelectedServicio={setSelectedServicio} />
       )}
+
+      {
+        ofertas.length > 0 && (
+          <ModalOfertas
+            isOpen={openModalOfertas}
+            onClose={() => setOpenModalOfertas(false)}
+            ofertas={ofertas}
+          />
+        )
+      }
 
       <style>{`
         @keyframes fadeIn {

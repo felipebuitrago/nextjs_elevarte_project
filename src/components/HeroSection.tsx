@@ -1,5 +1,7 @@
 "use client";
 
+import { agendarSessionWhatsApp } from "@/lib/utils";
+
 export default function HeroSection() {
   return (
     <div id='hero-section' className="relative min-h-screen overflow-hidden">
@@ -29,6 +31,7 @@ export default function HeroSection() {
         <div className="flex flex-col sm:flex-row gap-4 mb-16 animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
           <button
             className="px-8 py-4 bg-amber-800 text-white text-xl rounded-full font-Zain hover:bg-amber-900 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+            onClick={() => window.open(agendarSessionWhatsApp, '_blank')}
           >
             Agenda tu sesión
           </button>

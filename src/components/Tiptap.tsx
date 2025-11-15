@@ -19,16 +19,18 @@ import {
   AlignRight, AlignJustify, Highlighter, Heading1, Heading2, Heading3,
 } from 'lucide-react'
 import { savePost } from '@/lib/actions/postActions'
-import { ChangeEvent, useRef, useTransition, useActionState, useState } from "react";
-import { convertBlobUrlToFile } from "@/lib/utils";
+import { ChangeEvent, useRef, useTransition, useActionState, useState, useEffect } from "react";
+import { convertBlobUrlToFile, generateSlug } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { v4 as uuidv4 } from "uuid";
+import { useRouter } from 'next/navigation';
 
 interface TiptapProps {
   tags?: { id: string; name: string }[]
 }
 const Tiptap = ({ tags }: TiptapProps) => {
 
+  const router = useRouter();
   const [htmlContent, setHtmlContent] = useState('')
   const [coverImage, setCoverImage] = useState('')
 
@@ -100,6 +102,31 @@ const Tiptap = ({ tags }: TiptapProps) => {
     }
   };
 
+  useEffect(() => {
+    if (publishState?.success) {
+      const timer = setTimeout(() => {
+        router.push('/dashboard/posts');
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [publishState?.success]);
+
+  // Auto-generar slug cuando cambia el nombre (solo si no ha sido editado manualmente)
+  const [title, setTitle] = useState('')
+  const [slug, setSlug] = useState('')
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false)
+  useEffect(() => {
+    if (!isSlugManuallyEdited && title) {
+      setSlug(generateSlug(title))
+    }
+  }, [title, isSlugManuallyEdited])
+
+  const handleSlugChange = (value: string) => {
+    setIsSlugManuallyEdited(true)
+    setSlug(value)
+  }
+
   if (!editor) {
     return null
   }
@@ -120,6 +147,7 @@ const Tiptap = ({ tags }: TiptapProps) => {
               name="coverImage"
               className='hidden'
               value={coverImage}
+              required
               onChange={(e) => setCoverImage(e.target.value)}
             />
             <div>
@@ -163,6 +191,8 @@ const Tiptap = ({ tags }: TiptapProps) => {
               placeholder="Título del post"
               required
               disabled={pending}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
             />
           </div>
@@ -174,6 +204,8 @@ const Tiptap = ({ tags }: TiptapProps) => {
               name="slug"
               placeholder="titulo-del-post"
               required
+              value={slug}
+              onChange={(e) => handleSlugChange(e.target.value)}
               disabled={pending}
               className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
             />
@@ -186,6 +218,7 @@ const Tiptap = ({ tags }: TiptapProps) => {
               name="excerpt"
               placeholder="Breve descripción del post"
               disabled={pending}
+              required
               className='w-full px-4 py-3 rounded-xl border border-white/20 text-amber-900 font-DMSans'
             />
           </div>
@@ -197,6 +230,7 @@ const Tiptap = ({ tags }: TiptapProps) => {
               name="tagId"
               disabled={pending}
               className="px-3 py-2 border rounded-md"
+              required
             >
               <option value="">Sin tag</option>
               {tags && tags.map((tag) => (
@@ -406,6 +440,16 @@ const Tiptap = ({ tags }: TiptapProps) => {
 
         {/* Botones de acción */}
         <div className="flex justify-end gap-3">
+          {publishState?.success && (
+            <div className="p-4 bg-green-100 border border-green-200 rounded-2xl">
+              <p className="text-green-800 font-DMSans">{publishState.message}</p>
+            </div>
+          )}
+          {publishState?.success === false && (
+            <div className="p-4 bg-red-100 border border-red-200 rounded-2xl">
+              <p className="text-red-800 font-DMSans">{publishState?.message}</p>
+            </div>
+          )}
           <button
             type="submit"
             disabled={pending}

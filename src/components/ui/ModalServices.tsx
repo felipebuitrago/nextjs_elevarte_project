@@ -237,14 +237,17 @@ export default function ModalServices({
             )}
 
             {/* CTA */}
-            <button className={`
+            <button
+              className={`
                 w-full py-5 px-6 rounded-2xl font-Zain font-bold text-xl md:text-2xl
                 bg-gradient-to-r from-[#8B4513] to-[#A0522D]
                 text-white shadow-xl
                 transform transition-all duration-300
                 hover:shadow-2xl hover:scale-[1.02]
                 active:scale-95
-              `}>
+              `}
+              onClick={() => window.open(selectedServicio.mensajeWhatsApp, '_blank')}
+            >
               Agendar {selectedServicio.title}
             </button>
           </div>

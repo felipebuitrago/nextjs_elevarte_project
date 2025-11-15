@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
-import { Clock, Globe, Sparkles, Users } from 'lucide-react';
+import { Globe, Users } from 'lucide-react';
 import ModalCourses from './ui/ModalCourses';
+import { agendarDesarrolloIntuitivoWhatsApp } from '@/lib/utils';
 
 interface PracticaAdicional {
   presencial: string;
@@ -25,6 +26,7 @@ export interface Curso {
   esReiki: boolean; // Para agrupar visualmente
   orden: number; // Para ordenar los cursos
   badge?: string; // "Recomendado", "Popular", etc.
+  mensajeWhatsApp: string;
 }
 
 const cursos: Curso[] = [
@@ -54,7 +56,8 @@ const cursos: Curso[] = [
     modalidad: ['Presencial', 'Online'],
     esReiki: false,
     orden: 1,
-    badge: 'Recomendado para iniciar'
+    badge: 'Recomendado para iniciar',
+    mensajeWhatsApp: "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20un%20taller%20de%20Desarrollo%20Intuitivo",
   },
   {
     id: 'reiki-nivel-1',
@@ -90,7 +93,8 @@ const cursos: Curso[] = [
       virtual: '$50 (1 hora)'
     },
     esReiki: true,
-    orden: 2
+    orden: 2,
+    mensajeWhatsApp: "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20un%20curso%20de%20Reiki%20Nivel%201",
   },
   {
     id: 'reiki-nivel-2',
@@ -126,7 +130,8 @@ const cursos: Curso[] = [
       virtual: '$50 (1 hora)'
     },
     esReiki: true,
-    orden: 3
+    orden: 3,
+    mensajeWhatsApp: "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20un%20curso%20de%20Reiki%20Nivel%202",
   },
   {
     id: 'reiki-nivel-3',
@@ -162,6 +167,7 @@ const cursos: Curso[] = [
     },
     esReiki: true,
     orden: 4,
+    mensajeWhatsApp: "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20un%20curso%20de%20Reiki%20Nivel%203",
     badge: 'Maestría'
   }
 ];
@@ -387,7 +393,10 @@ export default function Cursos() {
             <p className="text-amber-800/70 text-lg mb-6 font-DMSans">
               ¿Aprendiendo sobre terapias energéticas por primera vez?
             </p>
-            <button className="px-8 py-4 bg-white/40 backdrop-blur-sm text-amber-900 rounded-full font-Zain font-bold text-xl border-2 border-white/60 hover:bg-white/60 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+            <button 
+              onClick={() => window.open(agendarDesarrolloIntuitivoWhatsApp, '_blank')}
+              className="px-8 py-4 bg-white/40 backdrop-blur-sm text-amber-900 rounded-full font-Zain font-bold text-xl border-2 border-white/60 hover:bg-white/60 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
               Comienza con Desarrollo Intuitivo
             </button>
           </div>

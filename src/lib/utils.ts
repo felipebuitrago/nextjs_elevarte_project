@@ -17,14 +17,31 @@ export async function convertBlobUrlToFile(blobUrl: string) {
   return file;
 }
 
-export const formatDate = (date: Date) => {
+export const formatDate = (dateString: string | null) => {
+  if (!dateString) return 'Fecha no disponible';
+
   return new Intl.DateTimeFormat('es', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
-  }).format(new Date(date))
-}
+  }).format(new Date(dateString));
+};
 
 export function generateId() {
   return createId();
 }
+
+export function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+export const agendarSessionWhatsApp = "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20una%20sesión";
+export const agendarDesarrolloIntuitivoWhatsApp = "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20un%20taller%20de%20Desarrollo%20Intuitivo";

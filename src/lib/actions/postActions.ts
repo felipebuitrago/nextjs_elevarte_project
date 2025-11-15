@@ -8,7 +8,12 @@ export async function savePost(prevState: any, formData: FormData) {
     const htmlContent = formData.get('content') as string;
     const supabase = await createClient();
 
-    // Crear testimonio en la base de datos
+    const coverImage = formData.get('coverImage') as string;
+
+    if (!coverImage) {
+      return { success: false, message: 'La imagen de portada es requerida' };
+    }
+    // Crear post en la base de datos
     const { error: createError } = await supabase
       .from('Post')
       .insert({
@@ -25,9 +30,9 @@ export async function savePost(prevState: any, formData: FormData) {
       });
 
     if (createError) throw createError;
-    return { success: true };
+    return { success: true, message: 'Post creado correctamente' };
   } catch (error: any) {
-    return { success: false };
+    return { success: false, message: "Error al crear el Post" };
   }
 }
 
@@ -72,10 +77,10 @@ export async function updatePost(prevState: any, formData: FormData) {
     revalidatePath('/blog');
     revalidatePath(`/blog/${slug}`);
 
-    return { success: true };
+    return { success: true, message: 'Post actualizado correctamente' };
   } catch (error: any) {
     console.error('Error updating post:', error);
-    return { success: false, error: error.message };
+    return { success: false, message: "Error al actualizar el Post" };
   }
 }
 

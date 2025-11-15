@@ -3,7 +3,8 @@
   src: url('../assets/fonts/DMSans.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
-  font-display: swap; /* Para mejor rendimiento */
+  font-display: swap;
+  /* Para mejor rendimiento */
 }
 
 @font-face {
@@ -40,12 +41,12 @@
 
 @import "tailwindcss";
 
-@theme{
-    --font-DMSans: 'DMSans', sans-serif;
-    --font-Dongle: 'Dongle-Regular', sans-serif;
-    --font-Zain: 'Zain-Regular', sans-serif;
-    --font-Zain-Bold: 'Zain-Bold', sans-serif;
-    --font-Zain-Light: 'Zain-Light', sans-serif;
+@theme {
+  --font-DMSans: 'DMSans', sans-serif;
+  --font-Dongle: 'Dongle-Regular', sans-serif;
+  --font-Zain: 'Zain-Regular', sans-serif;
+  --font-Zain-Bold: 'Zain-Bold', sans-serif;
+  --font-Zain-Light: 'Zain-Light', sans-serif;
 }
 
 /* Basic editor styles */
@@ -59,7 +60,8 @@
     margin: 1.5rem 0;
     padding-left: 1rem;
   }
-    /* List styles */
+
+  /* List styles */
   ul,
   ol {
     padding: 0 1rem;
@@ -70,7 +72,8 @@
       margin-bottom: 0.25em;
     }
   }
-    /* Mostrar puntos en listas no ordenadas */
+
+  /* Mostrar puntos en listas no ordenadas */
   ul {
     list-style-type: disc;
   }
@@ -186,20 +189,24 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
   @keyframes marquee {
-  from {
-    transform: translateX(0);
+    from {
+      transform: translateX(0);
     }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
+
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
     }
   }
+
   @keyframes marquee-vertical {
-  from {
-    transform: translateY(0);
+    from {
+      transform: translateY(0);
     }
-  to {
-    transform: translateY(calc(-100% - var(--gap)));
+
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
     }
   }
 }

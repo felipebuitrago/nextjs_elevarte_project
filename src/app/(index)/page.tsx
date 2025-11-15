@@ -6,20 +6,23 @@ import PodcastBlogSection from "@/components/PodcastBlogSection";
 import ServiceSection from "@/components/ServicesSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import DockNavigation from "@/components/ui/DockNavigation";
-import { PostWithTag } from "@/types";
+import { Oferta, PostWithTag } from "@/types";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function HomePage() {
 
   const supabase = await createClient();
     
-  // ✅ Testimonials
   const { data: testimonials, error: testimonialsError } = await supabase
-    .from('Testimonial') // Nombre de tu tabla (verifica en Supabase)
+    .from('Testimonial')
     .select('*')
     .eq('published', true);
+
+  const { data: ofertas, error: ofertasError } = await supabase
+    .from('Oferta')
+    .select('*')
+    .eq('activa', true);
   
-  // ✅ Posts con relación de tag
   const { data: posts, error: postsError } = await supabase
     .from('Post')
     .select(`
@@ -32,9 +35,11 @@ export default async function HomePage() {
   
   if (postsError) console.error('Error fetching posts:', postsError);
   if (testimonialsError) console.error('Error fetching testimonials:', testimonialsError);
+  if (ofertasError) console.error('Error fetching ofertas:', ofertasError);
   
   const safeTestimonials: any[] = testimonials ?? [];
   const safePosts: PostWithTag[] = posts ?? [];
+  const safeOfertas: Oferta[] = ofertas ?? [];
 
   return (
     <div className='bg-gradient-to-br from-[#d4c4b0] via-[#c9b59a] to-[#b8a589]'>
@@ -42,7 +47,7 @@ export default async function HomePage() {
 
       <HeroSection />
       <AboutMeSection />
-      <ServiceSection />
+      <ServiceSection ofertas={safeOfertas} />
       <CoursesSection />
       <TestimonialsSection testimonials={safeTestimonials} />
       <PodcastBlogSection posts={safePosts}/>

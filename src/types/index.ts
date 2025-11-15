@@ -35,3 +35,18 @@ export interface Testimonial {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface Oferta {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  incluye: string[]; // Array de strings
+  precio: string;
+  precioOriginal?: string | null;
+  descuento?: string | null;
+  validoHasta?: string | null;
+  destacada: boolean;
+  createdAt: string;
+  updatedAt: string;
+  activa: boolean;
+}
