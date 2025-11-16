@@ -349,6 +349,26 @@ export default function ServiceSection({ ofertas }: { ofertas: Oferta[] }) {
             })}
           </div>
 
+          {/* Ofertas button */}
+          {
+            ofertas.length > 0 && (
+              <div className="text-center mt-12">
+                <button
+                  className="group relative px-8 py-4 bg-gradient-to-r from-amber-500 via-amber-600 to-red-500 text-white rounded-2xl font-Zain font-bold text-xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 overflow-hidden cursor-pointer"
+                  onClick={() => setOpenModalOfertas(true)}
+                >
+                  {/* Efecto de brillo animado */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+
+                  {/* Contenido */}
+                  <span className="relative flex items-center gap-3">
+                    Mira nuestras ofertas especiales
+                  </span>
+                </button>
+              </div>
+            )
+          }
+
           {/* Bottom CTA */}
           <div className="text-center mt-16">
             <p className="text-amber-800/70 text-lg mb-6 font-DMSans">
@@ -362,19 +382,6 @@ export default function ServiceSection({ ofertas }: { ofertas: Oferta[] }) {
             </button>
           </div>
 
-          {/* Ofertas button */}
-          {
-            ofertas.length > 0 && (
-              <div className="text-center mt-12">
-                <button
-                  className="px-8 py-4 bg-white/40 backdrop-blur-sm text-amber-900 rounded-full font-Zain font-bold text-xl border-2 border-white/60 hover:bg-white/60 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-                  onClick={() => setOpenModalOfertas(true)}
-                >
-                  Mira nuestras ofertas especiales
-                </button>
-              </div>
-            )
-          }
         </div>
       </section>
 
