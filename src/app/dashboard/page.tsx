@@ -1,6 +1,3 @@
-import { redirect } from 'next/navigation'
-
-import { createClient } from '@/utils/supabase/server'
 import SignOutButton from '@/components/ui/SignOut'
 import Link from 'next/link';
 
@@ -28,22 +25,6 @@ const options = [
 ];
 
 export default async function PrivatePage() {
-  const supabase = await createClient()
-
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data?.user) {
-    redirect('/')
-  }
-
-  async function signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Error signing out:', error.message);
-    } else {
-      console.log('User signed out successfully.');
-    }
-  }
-
 
   return (
     <div className='flex flex-col items-center justify-center p-4'>

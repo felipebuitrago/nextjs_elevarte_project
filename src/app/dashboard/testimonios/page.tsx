@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { TestimonialActiveSwitch } from '@/components/ui/TestimonialActiveSwitch'
@@ -7,11 +6,6 @@ import { Testimonial } from '@/types'
 
 export default async function TestimonialsPage() {
   const supabase = await createClient()
-  const { data: userData, error: userError } = await supabase.auth.getUser()
-
-  if (userError || !userData?.user) {
-    redirect('/')
-  }
 
   // Obtener testimonios de la base de datos
   let testimonials: Testimonial[] = [];

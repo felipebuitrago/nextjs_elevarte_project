@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { Edit } from 'lucide-react'
@@ -7,11 +6,6 @@ import { Post } from '@/types'
 
 export default async function PostsPage() {
   const supabase = await createClient()
-  const { data: userData, error: userError } = await supabase.auth.getUser()
-  
-  if (userError || !userData?.user) {
-    redirect('/')
-  }
 
   // Obtener posts de la base de datos
   let posts: Post[] = [];

@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { TagActiveSwitch } from '@/components/ui/TagActiveSwitch'
@@ -6,11 +5,6 @@ import { Tag } from '@/types'
 
 export default async function TagsPage() {
   const supabase = await createClient()
-  const { data: userData, error: userError } = await supabase.auth.getUser()
-
-  if (userError || !userData?.user) {
-    redirect('/')
-  }
 
   // Obtener tags de la base de datos
   let tags: Tag[] = [];

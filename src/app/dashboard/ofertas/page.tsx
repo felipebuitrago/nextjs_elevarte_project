@@ -1,5 +1,3 @@
-// app/dashboard/ofertas/page.tsx
-import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import OfertaRow from '@/components/ui/OfertaRow'
@@ -7,11 +5,6 @@ import { Oferta } from '@/types'
 
 export default async function OfertasPage() {
   const supabase = await createClient()
-  const { data: userData, error: userError } = await supabase.auth.getUser()
-
-  if (userError || !userData?.user) {
-    redirect('/')
-  }
 
   let ofertas: Oferta[] = [];
 
