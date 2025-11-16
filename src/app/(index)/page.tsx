@@ -12,6 +12,8 @@ import { createClient } from "@/utils/supabase/server";
 export default async function HomePage() {
 
   const supabase = await createClient();
+  
+  const { data: { user } } = await supabase.auth.getUser();
     
   const { data: testimonials, error: testimonialsError } = await supabase
     .from('Testimonial')
@@ -43,6 +45,17 @@ export default async function HomePage() {
 
   return (
     <div className='bg-gradient-to-br from-[#d4c4b0] via-[#c9b59a] to-[#b8a589]'>
+      {user ? (
+        <div className="flex justify-end p-4">
+          <a
+            href="/dashboard"
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow"
+            aria-label="Go to dashboard"
+          >
+            Go to dashboard
+          </a>
+        </div>
+      ) : null}
       <DockNavigation />
 
       <HeroSection />
