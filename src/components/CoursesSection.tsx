@@ -264,7 +264,7 @@ export default function Cursos() {
                   {/* Image Section */}
                   <div className="relative h-48 md:h-auto bg-gradient-to-br from-amber-900/20 to-amber-800/20">
                     <img
-                      src="https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/ensenanza.jpg"
+                      src="https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/img1.jpg"
                       alt={curso.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />

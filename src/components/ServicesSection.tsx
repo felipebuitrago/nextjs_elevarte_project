@@ -117,7 +117,7 @@ const servicios = [
   {
     id: 'limpieza-espacios',
     icon: Home,
-    coverImage: "https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/limpieza_energetica.jpg",
+    coverImage: "https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/img3.jpg",
     title: 'Limpieza Energética de Espacios',
     subtitle: 'Renueva y purifica la energía de tu hogar o negocio y crea armonía.',
     shortDesc: 'Armoniza y libera energías en tus espacios',
@@ -143,7 +143,7 @@ const servicios = [
   {
     id: 'coaching-personal',
     icon: Users,
-    coverImage: "https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/coaching.jpg",
+    coverImage: "https://yahanudbuxwjkhcybtsc.supabase.co/storage/v1/object/public/elevarte_imgs/img2.jpg",
     title: 'Coaching Personal & PNL',
     subtitle: 'Transforma tus hábitos, pensamientos y emociones con guía consciente, y dale un cambio radical a tu vida.',
     shortDesc: 'Alcanza tus metas y transforma tu vida',
