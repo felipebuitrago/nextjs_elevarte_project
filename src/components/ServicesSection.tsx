@@ -72,7 +72,7 @@ const servicios = [
       {
         nombre: 'Sesión Esencial',
         duracion: '30 minutos',
-        retroalimentacion: 'Aproximadamente 15 minutos de retroalimentación, preguntas y respuestas',
+        retroalimentacion: 'Incluye retroalimentación, preguntas y respuestas',
         inversion: [
           { tipo: 'Presencial', precio: '$60' },
           { tipo: 'A distancia', precio: '$50' }
@@ -82,7 +82,7 @@ const servicios = [
       {
         nombre: 'Sesión de Equilibrio',
         duracion: '1 hora',
-        retroalimentacion: 'Aproximadamente 20 a 30 minutos de retroalimentación, preguntas y respuestas',
+        retroalimentacion: 'Incluye retroalimentación, preguntas y respuestas',
         inversion: [
           { tipo: 'Presencial', precio: '$80' },
           { tipo: 'A distancia', precio: '$70' }
@@ -92,7 +92,7 @@ const servicios = [
       {
         nombre: 'Sesión Profunda',
         duracion: '1.5 horas',
-        retroalimentacion: 'Aproximadamente 20 a 30 minutos de retroalimentación, preguntas y respuestas',
+        retroalimentacion: 'Incluye retroalimentación, preguntas y respuestas',
         inversion: [
           { tipo: 'Presencial', precio: '$100' }
         ],
@@ -102,7 +102,7 @@ const servicios = [
       {
         nombre: 'Sesión Integral Premium',
         duracion: '2 horas',
-        retroalimentacion: 'Aproximadamente 20 a 30 minutos de retroalimentación, preguntas y respuestas',
+        retroalimentacion: 'Incluye retroalimentación, preguntas y respuestas',
         inversion: [
           { tipo: 'Presencial', precio: '$130' }
         ],
@@ -110,7 +110,7 @@ const servicios = [
         nota: 'Las sesiones de 1.5 y 2 horas están disponibles únicamente de forma presencial, ya que requieren un nivel de trabajo energético más profundo y un acompañamiento cercano que se facilita mejor en persona.',
       }
     ],
-    notaGeneral: 'El tiempo de retroalimentación puede variar ligeramente según la energía que se haya movido durante el proceso y las preguntas o sensaciones que el cliente desee compartir. Este espacio es fundamental para integrar conscientemente lo vivido y comprender los mensajes o bloqueos energéticos identificados.',
+    //notaGeneral: 'El tiempo de retroalimentación puede variar ligeramente según la energía que se haya movido durante el proceso y las preguntas o sensaciones que el cliente desee compartir. Este espacio es fundamental para integrar conscientemente lo vivido y comprender los mensajes o bloqueos energéticos identificados.',
     notaEtica: 'El Reiki es un complemento holístico que favorece la sanación y el bienestar. No sustituye servicios médicos ni psicológicos, pero puede potenciar y acompañar tratamientos tradicionales al ser acompañamiento holístico.',
     mensajeWhatsApp: "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20una%20sesión%20de%20Reiki",
   },
@@ -135,9 +135,9 @@ const servicios = [
       "Incrementar sensación de renovación: Una limpieza energética del hogar brinda una sensación de frescura, renovación y nuevos comienzos, ayudando a liberar cualquier influencia o energía negativa asociada al pasado."
     ],
     duracion: 'Entre 1 y 1.5 horas',
-    precio: 'Hogares: desde $100\nOficinas: desde $120\nEmpresas (2 sesiones incluidas): desde $400',
+    precio: 'Hogares: Presencial desde $100, Virtual desde $80\nOficinas: Presencial desde $100, Virtual desde $80\nLocales comerciales: Presencial desde $150, Virtual desde $120\nEmpresas (2 sesiones incluidas): desde $400, Virtual desde $350',
     modalidad: ['Calgary, Canada'],
-    notaEtica: 'Este servicio está únicamente disponible en Calgary (Airdrie, Chestermere, Okotoks y Cochrane también disponibles por un valor adicional).',
+    notaEtica: 'El servicio presencial está disponible únicamente en Calgary (Airdrie, Chestermere, Cochrane, Okotoks, también disponibles por un valor adicional). Los servicios virtuales pueden realizarse desde cualquier parte del mundo.',
     mensajeWhatsApp: "https://wa.me/14035890618?text=Hola%20Camila,%20me%20gustaría%20agendar%20una%20limpieza%20energética%20de%20espacios",
   },
   {
