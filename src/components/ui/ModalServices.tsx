@@ -154,7 +154,7 @@ export default function ModalServices({
                         </div>
                         {opcion.retroalimentacion && (
                           <div className="text-xs text-amber-900/60 font-DMSans mt-2 leading-tight">
-                            + {opcion.retroalimentacion}
+                            {opcion.retroalimentacion}
                           </div>
                         )}
                       </div>
